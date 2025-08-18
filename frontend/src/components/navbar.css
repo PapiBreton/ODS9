@@ -1,0 +1,34 @@
+/* Icônes */
+.nav-icon {
+  font-size: 1.4rem;
+  margin-right: 0.5rem;
+}
+
+/* Effet soulignement */
+.hover-underline {
+  position: relative;
+}
+.hover-underline::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #ffc107;
+  transition: width 0.3s ease;
+}
+.hover-underline:hover::after {
+  width: 100%;
+}
+
+/* ✅ Onglet actif en jaune + underline toujours visible */
+.nav-link.active {
+  color: #ffc107 !important; /* texte jaune */
+}
+.nav-link.active .nav-icon {
+  color: #ffc107 !important; /* icône jaune */
+}
+.nav-link.active.hover-underline::after {
+  width: 100%; /* underline affiché même sans survol */
+}

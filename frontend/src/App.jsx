@@ -1,26 +1,16 @@
-import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router";
+import Liste from "./components/Liste";
+import Recherche from "./components/Recherche";
 
 function App() {
-  const [mots, setMots] = useState([]);
-
-  useEffect(() => {
-    fetch("/api/mots")
-      .then((res) => res.json())
-      .then((data) => setMots(data))
-      .catch((err) => console.error(err));
-  }, []);
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Dictionnaire ODS9</h1>
-      <ul>
-        {mots.map((m) => (
-          <li key={m._id}>
-            <strong>{m.mot}</strong> : {m.definition}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Routes>
+        <Route path="/" element={<Liste />}></Route>
+        <Route path="/recherche" element={<Recherche />}></Route>
+        <Route path="*" element={<Liste />} />
+      </Routes>
+    </>
   );
 }
 
