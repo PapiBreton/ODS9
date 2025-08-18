@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const motSchema = new mongoose.Schema({
   mot: { type: String, required: true },
   definition: { type: String, required: true },

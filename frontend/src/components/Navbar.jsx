@@ -53,6 +53,7 @@ export default function Navbar() {
           {/* Recherche */}
           <form className="d-flex" role="search">
             <input
+              id="searchInputNavbar"
               className="form-control me-2"
               type="search"
               placeholder="Rechercher..."
