@@ -1,5 +1,5 @@
 {
-  "name": "mon-projet",
+  "name": "ods-9",
     "scripts": {
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\""
   },

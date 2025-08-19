@@ -1,0 +1,15 @@
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 1rem;
+    max-width: 90%;
+  }
+
+  .modal-content {
+    font-size: 0.9rem;
+  }
+
+  .modal-body ul {
+    padding-left: 1rem;
+  }
+  
+}

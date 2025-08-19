@@ -1,0 +1,14 @@
+@media (max-width: 576px) {
+  .pagination-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .pagination-controls button {
+    width: 100%;
+  }
+
+  .pagination-controls span {
+    font-size: 0.9rem;
+  }
+}

@@ -1,14 +1,22 @@
 import { useEffect, useState, useCallback } from "react";
+import useAnagrams from "../utils/useAnagrammes";
 import Navbar from "./Navbar";
+import Pagination from "./Pagination";
+import MotList from "../components/MotList";
+import AnagramModal from "../components/AnagramModal";
 
-function Liste() {
+export default function Liste() {
+  const { fetchAnagrams } = useAnagrams();
   const [mots, setMots] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalMots, setTotalMots] = useState(0);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const limit = 14;
+  const [motPourAnagrammes, setMotPourAnagrammes] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalAnas, setModalAnas] = useState([]);
+  const limit = 13;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,10 +47,14 @@ function Liste() {
     fetchMots();
   }, [fetchMots]);
 
-  const handlePrev = useCallback(() => setPage((p) => p - 1), []);
-  const handleNext = useCallback(() => setPage((p) => p + 1), []);
-  const handleFirst = useCallback(() => setPage(1), []);
-  const handleLast = useCallback(() => setPage(totalPages), [totalPages]);
+  const handleShowAnagrams = async (mot) => {
+    const anas = await fetchAnagrams(mot);
+    setMotPourAnagrammes(mot);
+    setModalAnas(anas);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => setShowModal(false);
 
   return (
     <>
@@ -59,57 +71,28 @@ function Liste() {
           onChange={(e) => setSearch(e.target.value.toUpperCase())}
         />
 
-        {mots.length === 0 ? (
-          <p className="text-muted">Aucun mot trouvé.</p>
-        ) : (
-          <ul className="list-group mb-4">
-            {mots.map((m) => (
-              <li key={m._id} className="list-group-item">
-                <strong>{m.mot}</strong> : {m.definition}
-              </li>
-            ))}
-          </ul>
-        )}
+        <MotList mots={mots} onMotClick={handleShowAnagrams} />
 
-        <div className="d-flex justify-content-center align-items-center gap-2">
-          <button
-            className="btn btn-outline-primary"
-            onClick={handleFirst}
-            disabled={page === 1}
-          >
-            ⏮ Début
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            onClick={handlePrev}
-            disabled={page === 1}
-          >
-            ◀ Précédent
-          </button>
-          <span className="mx-2">
-            Page {page} sur {totalPages}
-          </span>
-          <button
-            className="btn btn-outline-primary"
-            onClick={handleNext}
-            disabled={page === totalPages}
-          >
-            Suivant ▶
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            onClick={handleLast}
-            disabled={page === totalPages}
-          >
-            Fin ⏭
-          </button>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onFirst={() => setPage(1)}
+          onPrev={() => setPage((p) => p - 1)}
+          onNext={() => setPage((p) => p + 1)}
+          onLast={() => setPage(totalPages)}
+        />
+
         <p className="mt-3 text-info text-center">
           Nombre total de mots : {totalMots}
         </p>
       </div>
+
+      <AnagramModal
+        show={showModal}
+        anagrammes={modalAnas}
+        onClose={handleCloseModal}
+        motPourAnagrammes={motPourAnagrammes}
+      />
     </>
   );
 }
-
-export default Liste;

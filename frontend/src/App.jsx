@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router";
+import "./styles/main.scss";
 import Liste from "./components/Liste";
 import Recherche from "./components/Recherche";
 

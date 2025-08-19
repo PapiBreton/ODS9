@@ -1,0 +1,14 @@
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1 {
+  color: var(--accent-color);
+}
+
+$vert: #6e9b81;
+.modal-header {
+  background-color: $vert;
+}

@@ -1,0 +1,14 @@
+:root {
+  --bg-color: #f1f2f6;
+  --text-color: #2d3436;
+  --accent-color: #ff6f61;
+  --custom-color: #7bed9f;
+}
+
+[data-theme='dark'] {
+  --bg-color: #2d3436;
+  --text-color: #f1f2f6;
+  --accent-color: #6c5ce7;
+  --custom-color: #ff007f;
+}
+$vert: #78e9a7;
