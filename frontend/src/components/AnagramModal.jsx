@@ -37,7 +37,7 @@ export default function AnagramModal({
                   ))}
                 </ul>
               ) : (
-                <p className="text-muted">Aucun anagramme trouvé.</p>
+                <p className="text-muted">Aucune anagramme trouvée.</p>
               )}
             </div>
             <div className="modal-footer d-flex justify-content-center">

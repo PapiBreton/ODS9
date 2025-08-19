@@ -60,7 +60,7 @@ export default function Liste() {
     <>
       <Navbar />
       <div className="container py-4">
-        <h1 className="mb-4">📘 ODS-9 sans conjugaisons</h1>
+        <h3 className="mb-4 text-center">📘 ODS-9 sans conjugaisons</h3>
 
         <input
           id="searchDico"
@@ -82,7 +82,7 @@ export default function Liste() {
           onLast={() => setPage(totalPages)}
         />
 
-        <p className="mt-3 text-info text-center">
+        <p className="mt-3 text-secondary text-center">
           Nombre total de mots : {totalMots}
         </p>
       </div>

@@ -8,7 +8,7 @@ export default function Pagination({
   onLast,
 }) {
   return (
-    <div className="pagination-controls d-flex flex-wrap justify-content-center align-items-center gap-2">
+    <div className="pagination-controls d-flex flex-wrap justify-content-center align-items-center gap-2 mt-4">
       <button
         className="btn btn-outline-primary btn-sm"
         onClick={onFirst}
