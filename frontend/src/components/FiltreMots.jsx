@@ -10,32 +10,32 @@ export default function FiltreMots({
   setFinMot,
 }) {
   return (
-    <div className="mb-4">
+    <div className="mb-4 d-flex flex-wrap flex-md-nowrap gap-2">
       <input
         type="text"
-        className="form-control mb-2"
-        placeholder="Début du mot..."
+        className="form-control"
+        placeholder="Début du mot"
         value={search}
         onChange={(e) => setSearch(e.target.value.toUpperCase())}
       />
       <input
         type="text"
-        className="form-control mb-2"
-        placeholder="Lettres obligatoires..."
+        className="form-control"
+        placeholder="Lettres obligatoires"
         value={lettresObligatoires}
         onChange={(e) => setLettresObligatoires(e.target.value.toUpperCase())}
       />
       <input
         type="text"
-        className="form-control mb-2"
-        placeholder="Lettres interdites..."
+        className="form-control"
+        placeholder="Lettres interdites"
         value={lettresInterdites}
         onChange={(e) => setLettresInterdites(e.target.value.toUpperCase())}
       />
       <input
         type="text"
         className="form-control"
-        placeholder="Fin du mot..."
+        placeholder="Fin du mot"
         value={finMot}
         onChange={(e) => setFinMot(e.target.value.toUpperCase())}
       />

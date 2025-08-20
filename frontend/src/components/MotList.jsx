@@ -34,7 +34,7 @@ export default function MotList({
               >
                 <span
                   className={`mot-texte fw-bold ${
-                    hasAnas ? "text-primary" : "text-secondary"
+                    hasAnas ? "text-primary" : "text-dark"
                   }`}
                 >
                   {mot.normalized}
