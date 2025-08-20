@@ -3,7 +3,8 @@ const Anagrammes = require("../models/Anagrammes");
 // Route anagrammes
 // Rechercher un mot précis
 exports.getAnagrammes = async (req, res) => {
-  const alphabet = `${req.params.mot}`;
+  const alphabet = req.params.mot;
+  console.log(`Recherche des anagrammes pour: ${alphabet}`);
   try {
     const data = await Anagrammes.findOne({
       normalized: alphabet,

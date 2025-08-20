@@ -1,0 +1,90 @@
+/* Ligne avec 4 colonnes:
+   1) mot (raccourci), 2) icône définition (milieu), 3) compteur, 4) bouton cacher (droite) */
+.ligne-principale {
+  display: grid;
+  grid-template-columns: clamp(8ch, 10vw,16ch) 48px 40px auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Bouton générique réutilisable */
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.icon-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Colonne mot (raccourcie) */
+.mot-col {
+  justify-self: start;
+}
+
+.mot-texte {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Icône définition au milieu */
+.def-col {
+  justify-self: center;
+  text-align: center;
+}
+
+/* Flèche/icone pivotante */
+.arrow-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+.arrow-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Compteur centré */
+.count {
+  text-align: center;
+  color: gray;
+  min-width: 24px;
+}
+
+/* Bouton cacher à droite */
+.btn-cacher {
+  justify-self: end;
+  white-space: nowrap;
+}
+
+/* Animation de la définition */
+.definition-inline {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 0;
+}
+.definition-inline.show {
+  max-height: 200px;
+  padding: 0.25rem 0;
+}
+
+/* Petits écrans: réduire un peu la première colonne */
+@media (max-width: 480px) {
+  .ligne-principale {
+    grid-template-columns: clamp(10ch, 20vw, 28ch) 44px 36px auto;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

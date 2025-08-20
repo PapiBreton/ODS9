@@ -1,82 +1,85 @@
-import React, { useState, useEffect, useRef } from "react";
-import "./MotList.css";
+import React, { useState } from "react";
+import IconButton from "./IconButton";
+import "./styles.css";
 
-function MotList({ mots, onMotClick }) {
-  const [listeMots, setListeMots] = useState([]);
-  const [enCours, setEnCours] = useState(null);
-  const [hoveredId, setHoveredId] = useState(null);
-  const itemRefs = useRef({});
+export default function MotList({
+  mots,
+  onMotClick,
+  cacherMot,
+  hoveredId,
+  setHoveredId,
+  enCours,
+}) {
+  const [openDefs, setOpenDefs] = useState({});
 
-  useEffect(() => {
-    if (mots) {
-      setListeMots(mots);
-    }
-  }, [mots]);
-
-  const cacherMot = async (id) => {
-    setEnCours(id);
-
-    const ref = itemRefs.current[id];
-    if (ref) {
-      ref.classList.add("fade-out");
-    }
-
-    setTimeout(async () => {
-      try {
-        const response = await fetch(`/api/mots/${id}/cacher`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
-
-        if (!response.ok) throw new Error("Erreur lors de la requête");
-
-        setListeMots((prev) => prev.filter((mot) => mot._id !== id));
-      } catch (error) {
-        console.error("Erreur :", error.message);
-      } finally {
-        setEnCours(null);
-      }
-    }, 500); // durée identique à la transition CSS
+  const toggleDefinition = (id) => {
+    setOpenDefs((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
     <ul className="list-group">
-      {listeMots.map((mot, index) => (
-        <li
-          className="list-group-item pb-0"
-          key={mot._id}
-          ref={(el) => (itemRefs.current[mot._id] = el)}
-          style={{
-            transition: "all 0.5s ease",
-            backgroundColor:
-              hoveredId === mot._id
-                ? "#dac27dff" // couleur survolée
-                : index % 2 === 0
-                ? "#f9f9f9"
-                : "#e0e0e0",
-          }}
-        >
-          <span
-            className="text-primary fw-bold cursor-pointer"
-            onClick={() => onMotClick(mot.mot)}
-          >
-            {mot.mot}
-          </span>
-          <span className="text-primary ms-2">{" : "}</span>
-          <small className="text-muted ms-2">{mot.definition}</small>
-          <button
-            className="btn btn-outline-warning btn-sm mb-1 d-flex justify-content-end float-end"
-            onClick={() => cacherMot(mot._id)}
-            onMouseEnter={() => setHoveredId(mot._id)}
-            onMouseLeave={() => setHoveredId(null)}
-            disabled={enCours === mot._id}
-          >
-            {enCours === mot._id ? "..." : "Cacher"}
-          </button>
-        </li>
-      ))}
+      {mots.map((mot) => {
+        const isOpen = !!openDefs[mot._id];
+        const hasAnas = mot.anagramCount > 1;
+
+        return (
+          <li className="list-group-item pb-0 li-mot" key={mot._id}>
+            <div className="ligne-principale">
+              {/* Colonne mot (raccourcie à gauche) */}
+              <IconButton
+                className="mot-col"
+                title={hasAnas ? "Voir les anagrammes" : "Aucune anagramme"}
+                onClick={() => hasAnas && onMotClick(mot.normalized)}
+                disabled={!hasAnas}
+              >
+                <span
+                  className={`mot-texte fw-bold ${
+                    hasAnas ? "text-primary" : "text-secondary"
+                  }`}
+                >
+                  {mot.normalized}
+                </span>
+              </IconButton>
+              {/* Compteur */}
+              <span className="count">
+                {hasAnas && <small>{mot.anagramCount}</small>}
+              </span>
+              {/* Icône définition au milieu */}
+              <IconButton
+                className="def-col"
+                title="Voir définition"
+                onClick={() => toggleDefinition(mot._id)}
+                ariaExpanded={isOpen}
+              >
+                <span className={`arrow-icon ${isOpen ? "open" : ""}`}>📖</span>
+              </IconButton>
+
+              {/* Bouton cacher à droite */}
+              <button
+                className="btn btn-outline-warning btn-sm btn-cacher"
+                onClick={() => cacherMot && cacherMot(mot._id)}
+                onMouseEnter={() => setHoveredId && setHoveredId(mot._id)}
+                onMouseLeave={() => setHoveredId && setHoveredId(null)}
+                disabled={enCours === mot._id}
+                title="Cacher"
+              >
+                <span className="d-inline d-sm-none">Cacher</span>
+                <span className="d-none d-sm-inline">
+                  {enCours === mot._id ? "..." : "Cacher"}
+                </span>
+              </button>
+            </div>
+
+            {/* Définition avec animation */}
+            <div
+              className={`definition-inline ${isOpen ? "show" : ""}`}
+              id={"mot-definition-" + mot._id}
+            >
+              <small className="text-secondary">{mot.definition}</small>
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }
-
-export default MotList;

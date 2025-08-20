@@ -1,24 +1,49 @@
 const Mot = require("../models/Mot");
 
-/*await Mot.updateMany(
-    
-    { $set: { visible: true } }
-  );*/
-
-// Récupérer tous les mots
+// Récupérer tous les mots avec filtres
 exports.getAllMots = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 14;
     const skip = (page - 1) * limit;
+
     const startsWith = req.query.startsWith || "";
+    const contains = req.query.contains || "";
+    const excludes = req.query.excludes || "";
+    const endsWith = req.query.endsWith || "";
+
+    // Construction dynamique de la regex
+    // ^ = début, $ = fin, .* = caractères quelconques
+    let regexPattern = "";
+
+    if (startsWith) {
+      regexPattern += `^${startsWith}`;
+    } else {
+      regexPattern += ".*";
+    }
+
+    if (contains) {
+      // ajout des lettres obligatoires de manière non ordonnée
+      for (const letter of contains) {
+        regexPattern += `(?=.*${letter})`;
+      }
+    }
+
+    if (endsWith) {
+      regexPattern += `${endsWith}$`;
+    } else {
+      regexPattern += ".*";
+    }
 
     const query = {
-      ...(startsWith
-        ? { mot: { $regex: `^${startsWith}`, $options: "i" } }
-        : {}),
       visible: true,
+      normalized: { $regex: regexPattern, $options: "i" },
     };
+
+    if (excludes) {
+      // Filtrer les mots ne contenant PAS certaines lettres
+      query.normalized.$not = new RegExp(`[${excludes}]`, "i");
+    }
 
     const mots = await Mot.find(query).skip(skip).limit(limit);
     const total = await Mot.countDocuments(query);

@@ -1,9 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
-import useAnagrams from "../utils/useAnagrammes";
-import Navbar from "./Navbar";
-import Pagination from "./Pagination";
-import MotList from "../components/MotList";
+import { useState, useEffect, useCallback } from "react";
+import Navbar from "../components/Navbar";
+import FiltreMots from "../components/FiltreMots";
+import MotList from "../components/MotList"; // Harmonisé
+import Pagination from "../components/Pagination";
 import AnagramModal from "../components/AnagramModal";
+import useAnagrams from "../utils/useAnagrammes";
 
 export default function Liste() {
   const { fetchAnagrams } = useAnagrams();
@@ -12,12 +13,17 @@ export default function Liste() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalMots, setTotalMots] = useState(0);
   const [search, setSearch] = useState("");
+  const [lettresObligatoires, setLettresObligatoires] = useState("");
+  const [lettresInterdites, setLettresInterdites] = useState("");
+  const [finMot, setFinMot] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [motPourAnagrammes, setMotPourAnagrammes] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalAnas, setModalAnas] = useState([]);
-  const limit = 13;
+  const [error, setError] = useState(null);
+  const limit = 15;
 
+  // Débounce sur la recherche
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -26,35 +32,55 @@ export default function Liste() {
     return () => clearTimeout(timer);
   }, [search]);
 
+  // Récupération des mots
   const fetchMots = useCallback(async () => {
     try {
+      setError(null);
       const params = new URLSearchParams({
         page,
         limit,
         startsWith: debouncedSearch,
+        contains: lettresObligatoires,
+        excludes: lettresInterdites,
+        endsWith: finMot,
       });
       const res = await fetch(`/api/mots?${params.toString()}`);
+      if (!res.ok) throw new Error("Erreur lors du chargement des mots");
       const data = await res.json();
       setMots(data.mots);
       setTotalPages(data.totalPages);
       setTotalMots(data.total);
     } catch (err) {
       console.error(err);
+      setError("Impossible de charger les données.");
     }
-  }, [page, debouncedSearch]);
+  }, [
+    page,
+    limit,
+    debouncedSearch,
+    lettresObligatoires,
+    lettresInterdites,
+    finMot,
+  ]);
 
   useEffect(() => {
     fetchMots();
   }, [fetchMots]);
 
+  // Ouverture modale anagrammes
   const handleShowAnagrams = async (mot) => {
     const anas = await fetchAnagrams(mot);
-    setMotPourAnagrammes(mot);
     setModalAnas(anas);
+    setMotPourAnagrammes(mot);
     setShowModal(true);
   };
 
-  const handleCloseModal = () => setShowModal(false);
+  // Fermeture modale
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setModalAnas([]);
+    setMotPourAnagrammes("");
+  };
 
   return (
     <>
@@ -62,14 +88,18 @@ export default function Liste() {
       <div className="container py-4">
         <h3 className="mb-4 text-center">📘 ODS-9 sans conjugaisons</h3>
 
-        <input
-          id="searchDico"
-          type="text"
-          className="form-control mb-3"
-          placeholder="Début du mot..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value.toUpperCase())}
+        <FiltreMots
+          search={search}
+          setSearch={setSearch}
+          lettresObligatoires={lettresObligatoires}
+          setLettresObligatoires={setLettresObligatoires}
+          lettresInterdites={lettresInterdites}
+          setLettresInterdites={setLettresInterdites}
+          finMot={finMot}
+          setFinMot={setFinMot}
         />
+
+        {error && <p className="text-danger text-center">{error}</p>}
 
         <MotList mots={mots} onMotClick={handleShowAnagrams} />
 
@@ -77,8 +107,8 @@ export default function Liste() {
           page={page}
           totalPages={totalPages}
           onFirst={() => setPage(1)}
-          onPrev={() => setPage((p) => p - 1)}
-          onNext={() => setPage((p) => p + 1)}
+          onPrev={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
           onLast={() => setPage(totalPages)}
         />
 
