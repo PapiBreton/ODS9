@@ -6,7 +6,6 @@ export default function MotList({
   mots,
   onMotClick,
   cacherMot,
-  hoveredId,
   setHoveredId,
   enCours,
 }) {
