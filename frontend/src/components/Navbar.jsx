@@ -1,33 +1,15 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import ThemeToggle from "../assets/ThemeToggle";
 import { NavLink } from "react-router";
 import "./navbar.css";
 
 export default function Navbar() {
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "light"
-  );
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () =>
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
       <div className="container">
         {/* Logo */}
-        <NavLink
-          to="/"
-          className="navbar-brand fw-bold d-flex align-items-center"
-        >
-          <i className="bi bi-lightning-charge nav-icon text-warning"></i>
+        <span className="navbar-brand fw-bold d-flex align-items-center">
+          <i className="bi bi-emoji-smile nav-icon text-warning "></i>
           ODS-9
-        </NavLink>
-
+        </span>
         {/* Bouton burger mobile */}
         <button
           className="navbar-toggler"
@@ -37,11 +19,19 @@ export default function Navbar() {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-
         {/* Liens */}
-
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0 d-flex align-items-center">
+            <li className="nav-item">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `nav-link hover-underline ${isActive ? "active" : ""}`
+                }
+              >
+                Dico
+              </NavLink>
+            </li>
             <li className="nav-item">
               <NavLink
                 to="/anagrammes"
@@ -49,7 +39,7 @@ export default function Navbar() {
                   `nav-link hover-underline ${isActive ? "active" : ""}`
                 }
               >
-                Anagrammes
+                Tirages
               </NavLink>
             </li>
             <li className="nav-item">
@@ -77,9 +67,6 @@ export default function Navbar() {
               <i className="bi bi-search"></i>
             </button>
           </form>
-        </div>
-        <div className="ps-3 d-flex align-items-center">
-          <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
         </div>
       </div>
     </nav>
