@@ -1,47 +1,54 @@
+/* FiltreMots.css */
+
 .filtre-card {
-  background-color: #d1c6dd; /* Couleur de fond claire */
+  background-color: #d1c6dd;
   border: none;
   border-radius: 10px;
 }
 
 /* Couleurs de fond assorties aux labels */
-.input-primary {
-  background-color: rgba(13, 110, 253, 0.1); /* bleu clair */
-  border: 2px solid #0d6efd;
+.filtre-card .form-control.input-primary {
+  background-color: rgba(13, 110, 253, 0.1) !important;
+  border: 2px solid #0d6efd !important;
 }
 
-.input-success {
-  background-color: rgba(25, 135, 84, 0.1); /* vert clair */
-  border: 2px solid #198754;
+.filtre-card .form-control.input-success {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+  border: 2px solid #198754 !important;
 }
 
-.input-danger {
-  background-color: rgba(220, 53, 69, 0.1); /* rouge clair */
-  border: 2px solid #dc3545;
+.filtre-card .form-control.input-danger {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  border: 2px solid #dc3545 !important;
 }
 
-.input-warning {
-  background-color: rgba(255, 193, 7, 0.15); /* jaune clair */
-  border: 2px solid #ffc107;
+.filtre-card .form-control.input-warning {
+  background-color: rgba(255, 193, 7, 0.15) !important;
+  border: 2px solid #ffc107 !important;
+}
+
+.filtre-card .form-control.input-secondary {
+  background-color: rgba(255, 193, 7, 0.15) !important;
+  border: 2px solid #daca99 !important;
 }
 
 /* Effet focus */
-.input-primary:focus,
-.input-success:focus,
-.input-danger:focus,
-.input-warning:focus {
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+.filtre-card .form-control.input-primary:focus,
+.filtre-card .form-control.input-success:focus,
+.filtre-card .form-control.input-danger:focus,
+.filtre-card .form-control.input-warning:focus {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Bouton dégradé */
-.btn-gradient {
+.filtre-card .btn-gradient {
   background: linear-gradient(90deg, #4f6568, #688f6a);
   color: white;
   border: none;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.btn-gradient:hover {
+.filtre-card .btn-gradient:hover {
   transform: scale(1.05);
   opacity: 0.9;
 }

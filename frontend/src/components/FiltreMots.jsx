@@ -1,4 +1,5 @@
-import React from "react";
+// FiltreMots.jsx
+import React, { useState, useEffect } from "react";
 import "./FiltreMots.css";
 
 export default function FiltreMots({
@@ -10,22 +11,46 @@ export default function FiltreMots({
   setLettresInterdites,
   finMot,
   setFinMot,
+  minLength,
+  setMinLength,
+  maxLength,
+  setMaxLength,
 }) {
+  const [errorLength, setErrorLength] = useState("");
+
+  // Validation min ≤ max
+  useEffect(() => {
+    if (
+      minLength !== "" &&
+      maxLength !== "" &&
+      Number(minLength) > Number(maxLength)
+    ) {
+      setErrorLength(
+        "La longueur min doit être inférieure ou égale à la longueur max"
+      );
+    } else {
+      setErrorLength("");
+    }
+  }, [minLength, maxLength]);
+
+  // Réinitialiser tous les filtres
   const handleReset = () => {
     setSearch("");
     setLettresObligatoires("");
     setLettresInterdites("");
     setFinMot("");
+    setMinLength("2");
+    setMaxLength("8");
   };
 
   return (
     <div className="card filtre-card p-3 mb-4 shadow-sm">
-      <div className="row g-3">
-        {/* Recherche par début */}
-        <div className="col-md-3">
+      <div className="row g-3 align-items-end">
+        {/* Commence par */}
+        <div className="col-12 col-md-6 col-lg-3">
           <label
-            className="form-label fw-bold text-primary"
             htmlFor="searchStartsWith"
+            className="form-label fw-bold text-primary"
           >
             Commence par
           </label>
@@ -33,66 +58,111 @@ export default function FiltreMots({
             type="text"
             id="searchStartsWith"
             className="form-control input-primary"
+            autoComplete="off"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        {/* Lettres obligatoires */}
-        <div className="col-md-3">
+        {/* Contient */}
+        <div className="col-12 col-md-6 col-lg-3">
           <label
-            className="form-label fw-bold text-success"
             htmlFor="searchContains"
+            className="form-label fw-bold text-success"
           >
             Contient
           </label>
           <input
             type="text"
             id="searchContains"
+            autoComplete="off"
             className="form-control input-success"
             value={lettresObligatoires}
             onChange={(e) => setLettresObligatoires(e.target.value)}
           />
         </div>
 
-        {/* Lettres interdites */}
-        <div className="col-md-3">
+        {/* Sans lettres */}
+        <div className="col-12 col-md-6 col-lg-3">
           <label
-            className="form-label fw-bold text-danger"
             htmlFor="searchExcludes"
+            className="form-label fw-bold text-danger"
           >
             Sans lettres
           </label>
           <input
             type="text"
             id="searchExcludes"
+            autoComplete="off"
             className="form-control input-danger"
             value={lettresInterdites}
             onChange={(e) => setLettresInterdites(e.target.value)}
           />
         </div>
 
-        {/* Fin du mot */}
-        <div className="col-md-3">
+        {/* Finit par */}
+        <div className="col-12 col-md-6 col-lg-3">
           <label
-            className="form-label fw-bold text-primary"
             htmlFor="searchEndsWith"
+            className="form-label fw-bold text-primary"
           >
             Finit par
           </label>
           <input
             type="text"
             id="searchEndsWith"
+            autoComplete="off"
             className="form-control input-primary"
             value={finMot}
             onChange={(e) => setFinMot(e.target.value)}
           />
         </div>
+
+        {/* Longueurs min / max */}
+        {/* Flex centré pour min/max sur tous les écrans */}
+        <div className="d-flex justify-content-center gap-3 mt-3">
+          <div className="flex-shrink-1" style={{ maxWidth: "260px" }}>
+            <input
+              type="number"
+              id="minLength"
+              className="form-control input-secondary"
+              autoComplete="off"
+              placeholder="2"
+              min="2"
+              value={minLength}
+              onChange={(e) => setMinLength(e.target.value)}
+              aria-describedby="error-length"
+            />
+          </div>
+
+          <div className="flex-shrink-1" style={{ maxWidth: "260px" }}>
+            <input
+              type="number"
+              id="maxLength"
+              className="form-control input-secondary"
+              autoComplete="off"
+              placeholder="8"
+              max="8"
+              value={maxLength}
+              onChange={(e) => setMaxLength(e.target.value)}
+              aria-describedby="error-length"
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Bouton reset */}
-      <div className="mt-3 text-end">
-        <button className="btn btn-gradient btn-sm" onClick={handleReset}>
+      {errorLength && (
+        <div id="error-length" className="text-danger mt-2">
+          {errorLength}
+        </div>
+      )}
+      {/* Bouton Réinitialiser */}
+      <div className="mt-3 text-center">
+        <button
+          className="btn btn-gradient btn-sm"
+          onClick={handleReset}
+          disabled={!!errorLength}
+        >
           Réinitialiser les filtres
         </button>
       </div>

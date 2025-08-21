@@ -18,6 +18,9 @@ export default function Liste() {
   const [lettresObligatoires, setLettresObligatoires] = useState("");
   const [lettresInterdites, setLettresInterdites] = useState("");
   const [finMot, setFinMot] = useState("");
+  // src/pages/Liste.jsx
+  const [minLength, setMinLength] = useState("2");
+  const [maxLength, setMaxLength] = useState("8");
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [motPourAnagrammes, setMotPourAnagrammes] = useState("");
@@ -50,8 +53,9 @@ export default function Liste() {
         contains: lettresObligatoires,
         excludes: lettresInterdites,
         endsWith: finMot,
+        minLength,
+        maxLength,
       });
-
       const res = await fetch(`/api/mots?${params.toString()}`);
       if (!res.ok) throw new Error("Erreur lors du chargement des mots");
 
@@ -72,6 +76,8 @@ export default function Liste() {
     lettresObligatoires,
     lettresInterdites,
     finMot,
+    minLength,
+    maxLength,
   ]);
 
   useEffect(() => {
@@ -108,6 +114,10 @@ export default function Liste() {
           setLettresInterdites={setLettresInterdites}
           finMot={finMot}
           setFinMot={setFinMot}
+          minLength={minLength}
+          setMinLength={setMinLength}
+          maxLength={maxLength}
+          setMaxLength={setMaxLength}
         />
 
         {loading && <p className="text-center text-info">Chargement...</p>}

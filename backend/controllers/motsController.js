@@ -37,12 +37,15 @@ const buildMotQuery = ({ startsWith, contains, excludes, endsWith }) => {
 // Contrôleur principal
 exports.getAllMots = async (req, res) => {
   try {
-    // Validation et valeurs par défaut
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 15));
     const skip = (page - 1) * limit;
 
-    // Construction de la requête
+    // Extraire et convertir les longueurs
+    const minLen = parseInt(req.query.minLength) || 2;
+    const maxLen = parseInt(req.query.maxLength) || 8;
+
+    // Base de votre query existante
     const query = buildMotQuery({
       startsWith: req.query.startsWith || "",
       contains: req.query.contains || "",
@@ -50,13 +53,22 @@ exports.getAllMots = async (req, res) => {
       endsWith: req.query.endsWith || "",
     });
 
-    // Exécution en parallèle
+    // Ajout du filtre de longueur via regex
+    if (minLen !== null || maxLen !== null) {
+      // Ex. ?minLength=3&maxLength=5 → /^.{3,5}$/
+      const minPart = minLen !== null ? minLen : "";
+      const maxPart = maxLen !== null ? maxLen : "";
+      query.mot = {
+        ...query.mot,
+        $regex: new RegExp(`^.{${minPart},${maxPart}}$`),
+      };
+    }
+
     const [mots, total] = await Promise.all([
       Mot.find(query).sort({ mot: 1 }).skip(skip).limit(limit).lean(),
       Mot.countDocuments(query),
     ]);
 
-    // Réponse
     res.json({
       page,
       limit,
