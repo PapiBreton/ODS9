@@ -123,19 +123,6 @@ export default function Liste() {
     setMotPourAnagrammes("");
   };
 
-  // reset des filtres
-  const handleResetFilters = () => {
-    setSearch("");
-    setDebouncedSearch("");
-    setLettresObligatoires("");
-    setLettresInterdites("");
-    setFinMot("");
-    setMinLength("2");
-    setMaxLength("8");
-    setPage(1);
-    setMots([]);
-  };
-
   return (
     <>
       <Navbar />
