@@ -84,7 +84,18 @@
     grid-template-columns: clamp(10ch, 20vw, 28ch) 44px 36px auto;
   }
 }
+/* Impairs : dégradé bleu clair */
+.li-mot:nth-child(odd) {
+  background: linear-gradient(90deg, #c8d1da 100%, #bdccdd 10%);
+}
 
-.cursor-pointer {
-  cursor: pointer;
+/* Pairs : dégradé vert clair */
+.li-mot:nth-child(even) {
+  background: linear-gradient(90deg, #b4c4b4 0%, #aec7ae 100%);
+}
+
+/* Effet au survol */
+.li-mot:hover {
+  background: linear-gradient(90deg, #fff8dc 0%, #fff3b0 100%);
+  transition: background 0.3s ease;
 }

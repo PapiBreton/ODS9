@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Navbar from "../components/Navbar";
 import FiltreMots from "../components/FiltreMots";
-import MotList from "../components/MotList"; // Harmonisé
+import MotList from "../components/MotList";
 import Pagination from "../components/Pagination";
 import AnagramModal from "../components/AnagramModal";
 import useAnagrams from "../utils/useAnagrammes";
@@ -12,15 +12,20 @@ export default function Liste() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalMots, setTotalMots] = useState(0);
+
+  // Filtres
   const [search, setSearch] = useState("");
   const [lettresObligatoires, setLettresObligatoires] = useState("");
   const [lettresInterdites, setLettresInterdites] = useState("");
   const [finMot, setFinMot] = useState("");
+
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [motPourAnagrammes, setMotPourAnagrammes] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalAnas, setModalAnas] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const limit = 15;
 
   // Débounce sur la recherche
@@ -36,6 +41,8 @@ export default function Liste() {
   const fetchMots = useCallback(async () => {
     try {
       setError(null);
+      setLoading(true);
+
       const params = new URLSearchParams({
         page,
         limit,
@@ -44,8 +51,10 @@ export default function Liste() {
         excludes: lettresInterdites,
         endsWith: finMot,
       });
+
       const res = await fetch(`/api/mots?${params.toString()}`);
       if (!res.ok) throw new Error("Erreur lors du chargement des mots");
+
       const data = await res.json();
       setMots(data.mots);
       setTotalPages(data.totalPages);
@@ -53,6 +62,8 @@ export default function Liste() {
     } catch (err) {
       console.error(err);
       setError("Impossible de charger les données.");
+    } finally {
+      setLoading(false);
     }
   }, [
     page,
@@ -99,7 +110,11 @@ export default function Liste() {
           setFinMot={setFinMot}
         />
 
+        {loading && <p className="text-center text-info">Chargement...</p>}
         {error && <p className="text-danger text-center">{error}</p>}
+        {!loading && !error && mots.length === 0 && (
+          <p className="text-center text-muted">Aucun mot trouvé.</p>
+        )}
 
         <MotList mots={mots} onMotClick={handleShowAnagrams} />
 

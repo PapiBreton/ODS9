@@ -33,10 +33,10 @@ export default function MotList({
               >
                 <span
                   className={`mot-texte fw-bold ${
-                    hasAnas ? "text-primary" : "text-dark"
+                    hasAnas ? "text-primary" : "text-black"
                   }`}
                 >
-                  {mot.normalized}
+                  {mot.mot}
                 </span>
               </IconButton>
               {/* Compteur */}
@@ -55,7 +55,7 @@ export default function MotList({
 
               {/* Bouton cacher à droite */}
               <button
-                className="btn btn-outline-warning btn-sm btn-cacher"
+                className="btn btn-outline-danger btn-sm btn-cacher mb-2"
                 onClick={() => cacherMot && cacherMot(mot._id)}
                 onMouseEnter={() => setHoveredId && setHoveredId(mot._id)}
                 onMouseLeave={() => setHoveredId && setHoveredId(null)}

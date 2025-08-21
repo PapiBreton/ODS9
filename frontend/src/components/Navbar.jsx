@@ -24,7 +24,7 @@ export default function Navbar() {
           <ul className="navbar-nav me-auto mb-2 mb-lg-0 d-flex align-items-center">
             <li className="nav-item">
               <NavLink
-                to="/"
+                to="/dico"
                 className={({ isActive }) =>
                   `nav-link hover-underline ${isActive ? "active" : ""}`
                 }

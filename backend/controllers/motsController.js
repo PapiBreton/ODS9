@@ -1,53 +1,62 @@
 const Mot = require("../models/Mot");
+// Controller pour gérer les mots
+// Utilitaire pour échapper les caractères spéciaux dans une regex
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-// Récupérer tous les mots avec filtres
+// Fonction qui construit la requête MongoDB
+const buildMotQuery = ({ startsWith, contains, excludes, endsWith }) => {
+  const andConditions = [{ visible: true }];
+
+  if (startsWith) {
+    andConditions.push({
+      mot: { $regex: `^${escapeRegex(startsWith)}`, $options: "i" },
+    });
+  }
+
+  if (contains) {
+    andConditions.push({
+      mot: { $regex: escapeRegex(contains), $options: "i" },
+    });
+  }
+
+  if (endsWith) {
+    andConditions.push({
+      mot: { $regex: `${escapeRegex(endsWith)}$`, $options: "i" },
+    });
+  }
+
+  if (excludes) {
+    andConditions.push({
+      mot: { $not: new RegExp(`[${escapeRegex(excludes)}]`, "i") },
+    });
+  }
+
+  return andConditions.length > 1 ? { $and: andConditions } : andConditions[0];
+};
+
+// Contrôleur principal
 exports.getAllMots = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 14;
+    // Validation et valeurs par défaut
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 15));
     const skip = (page - 1) * limit;
 
-    const startsWith = req.query.startsWith || "";
-    const contains = req.query.contains || "";
-    const excludes = req.query.excludes || "";
-    const endsWith = req.query.endsWith || "";
+    // Construction de la requête
+    const query = buildMotQuery({
+      startsWith: req.query.startsWith || "",
+      contains: req.query.contains || "",
+      excludes: req.query.excludes || "",
+      endsWith: req.query.endsWith || "",
+    });
 
-    // Construction dynamique de la regex
-    // ^ = début, $ = fin, .* = caractères quelconques
-    let regexPattern = "";
+    // Exécution en parallèle
+    const [mots, total] = await Promise.all([
+      Mot.find(query).sort({ mot: 1 }).skip(skip).limit(limit).lean(),
+      Mot.countDocuments(query),
+    ]);
 
-    if (startsWith) {
-      regexPattern += `^${startsWith}`;
-    } else {
-      regexPattern += ".*";
-    }
-
-    if (contains) {
-      // ajout des lettres obligatoires de manière non ordonnée
-      for (const letter of contains) {
-        regexPattern += `(?=.*${letter})`;
-      }
-    }
-
-    if (endsWith) {
-      regexPattern += `${endsWith}$`;
-    } else {
-      regexPattern += ".*";
-    }
-
-    const query = {
-      visible: true,
-      normalized: { $regex: regexPattern, $options: "i" },
-    };
-
-    if (excludes) {
-      // Filtrer les mots ne contenant PAS certaines lettres
-      query.normalized.$not = new RegExp(`[${excludes}]`, "i");
-    }
-
-    const mots = await Mot.find(query).skip(skip).limit(limit);
-    const total = await Mot.countDocuments(query);
-
+    // Réponse
     res.json({
       page,
       limit,
@@ -56,7 +65,8 @@ exports.getAllMots = async (req, res) => {
       mots,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Erreur lors de la récupération des mots:", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 };
 
