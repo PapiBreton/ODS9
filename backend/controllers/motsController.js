@@ -3,8 +3,24 @@ const Mot = require("../models/Mot");
 // Utilitaire pour échapper les caractères spéciaux dans une regex
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-// Fonction qui construit la requête MongoDB
-const buildMotQuery = ({ startsWith, contains, excludes, endsWith }) => {
+/**
+ * Construit une query MongoDB pour filtrer les mots
+ * @param {Object} params
+ * @param {string} params.startsWith
+ * @param {string} params.contains
+ * @param {string} params.excludes
+ * @param {string} params.endsWith
+ * @param {number} params.minLength
+ * @param {number} params.maxLength
+ */
+const buildMotQuery = ({
+  startsWith,
+  contains,
+  excludes,
+  endsWith,
+  minLength,
+  maxLength,
+}) => {
   const andConditions = [{ visible: true }];
 
   if (startsWith) {
@@ -14,8 +30,15 @@ const buildMotQuery = ({ startsWith, contains, excludes, endsWith }) => {
   }
 
   if (contains) {
+    // Pour chaque caractère, on crée un lookahead qui garantit sa présence
+    const letters = Array.from(contains);
+    const lookaheads = letters
+      .map((char) => `(?=.*${escapeRegex(char)})`)
+      .join("");
+    const regex = new RegExp(`^${lookaheads}.*$`, "i");
+
     andConditions.push({
-      mot: { $regex: escapeRegex(contains), $options: "i" },
+      mot: { $regex: regex },
     });
   }
 
@@ -31,39 +54,47 @@ const buildMotQuery = ({ startsWith, contains, excludes, endsWith }) => {
     });
   }
 
+  // Filtre sur la longueur du mot
+  if (minLength != null || maxLength != null) {
+    const minPart = minLength != null ? minLength : "";
+    const maxPart = maxLength != null ? maxLength : "";
+    const lengthRegex = new RegExp(`^.{${minPart},${maxPart}}$`);
+
+    andConditions.push({
+      mot: { $regex: lengthRegex },
+    });
+  }
+
   return andConditions.length > 1 ? { $and: andConditions } : andConditions[0];
 };
 
-// Contrôleur principal
 exports.getAllMots = async (req, res) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 15));
+    // Pagination
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(req.query.limit, 10) || 15)
+    );
     const skip = (page - 1) * limit;
 
-    // Extraire et convertir les longueurs
-    const minLen = parseInt(req.query.minLength) || 2;
-    const maxLen = parseInt(req.query.maxLength) || 8;
+    // Longueurs minimale et maximale
+    const minLength =
+      req.query.minLength != null ? parseInt(req.query.minLength, 10) : null;
+    const maxLength =
+      req.query.maxLength != null ? parseInt(req.query.maxLength, 10) : null;
 
-    // Base de votre query existante
+    // Construction de la requête
     const query = buildMotQuery({
       startsWith: req.query.startsWith || "",
       contains: req.query.contains || "",
       excludes: req.query.excludes || "",
       endsWith: req.query.endsWith || "",
+      minLength,
+      maxLength,
     });
 
-    // Ajout du filtre de longueur via regex
-    if (minLen !== null || maxLen !== null) {
-      // Ex. ?minLength=3&maxLength=5 → /^.{3,5}$/
-      const minPart = minLen !== null ? minLen : "";
-      const maxPart = maxLen !== null ? maxLen : "";
-      query.mot = {
-        ...query.mot,
-        $regex: new RegExp(`^.{${minPart},${maxPart}}$`),
-      };
-    }
-
+    // Exécution parallèle de la recherche et du comptage
     const [mots, total] = await Promise.all([
       Mot.find(query).sort({ mot: 1 }).skip(skip).limit(limit).lean(),
       Mot.countDocuments(query),

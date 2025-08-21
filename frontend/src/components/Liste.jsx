@@ -18,6 +18,7 @@ export default function Liste() {
 
   // filtres
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [lettresObligatoires, setLettresObligatoires] = useState("");
   const [lettresInterdites, setLettresInterdites] = useState("");
   const [finMot, setFinMot] = useState("");
@@ -25,7 +26,6 @@ export default function Liste() {
   const [maxLength, setMaxLength] = useState("8");
 
   // debounce sur la recherche
-  const [debouncedSearch, setDebouncedSearch] = useState("");
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -34,8 +34,18 @@ export default function Liste() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // sentinel pour infinite scroll
-  const loaderRef = useRef(null);
+  // reset liste et page à chaque changement de filtre
+  useEffect(() => {
+    setMots([]);
+    setPage(1);
+  }, [
+    debouncedSearch,
+    lettresObligatoires,
+    lettresInterdites,
+    finMot,
+    minLength,
+    maxLength,
+  ]);
 
   // fetch des mots (remplace ou concatène selon page)
   const fetchMots = useCallback(async () => {
@@ -57,7 +67,6 @@ export default function Liste() {
       const { mots: newMots, totalPages: tp, total } = await res.json();
       setTotalPages(tp);
       setTotalMots(total);
-
       setMots((prev) => (page === 1 ? newMots : [...prev, ...newMots]));
     } catch (err) {
       console.error(err);
@@ -78,19 +87,8 @@ export default function Liste() {
     fetchMots();
   }, [fetchMots]);
 
-  // reset liste au changement de filtres
-  useEffect(() => {
-    setMots([]);
-  }, [
-    debouncedSearch,
-    lettresObligatoires,
-    lettresInterdites,
-    finMot,
-    minLength,
-    maxLength,
-  ]);
-
   // infinite scroll via IntersectionObserver
+  const loaderRef = useRef(null);
   useEffect(() => {
     if (page >= totalPages) return;
     const observer = new IntersectionObserver(
@@ -123,6 +121,19 @@ export default function Liste() {
     setMotPourAnagrammes("");
   };
 
+  // Réinitialisation globale filtres + pagination + scroll + debounce
+  const handleResetAll = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setLettresObligatoires("");
+    setLettresInterdites("");
+    setFinMot("");
+    setMinLength("2");
+    setMaxLength("8");
+    setPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <>
       <Navbar />
@@ -143,6 +154,7 @@ export default function Liste() {
           setMinLength={setMinLength}
           maxLength={maxLength}
           setMaxLength={setMaxLength}
+          onReset={handleResetAll}
         />
 
         <div className="mb-2 text-center">
@@ -158,9 +170,15 @@ export default function Liste() {
         {page < totalPages && (
           <p className="text-center text-info">Chargement...</p>
         )}
-        {page >= totalPages && (
-          <p className="text-center text-muted">
-            Vous avez atteint la fin ({totalMots} mots).
+        {totalMots > 0 && page >= totalPages && (
+          <p className="text-center text-white">
+            Vous avez atteint la fin ({totalMots}{" "}
+            {totalMots === 1 ? "mot" : "mots"}).
+          </p>
+        )}
+        {totalMots === 0 && (
+          <p className="text-center text-white">
+            Aucune solution trouvée avec ces filtres !
           </p>
         )}
       </div>

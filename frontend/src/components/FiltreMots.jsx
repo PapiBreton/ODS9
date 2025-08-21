@@ -1,4 +1,4 @@
-// FiltreMots.jsx
+// src/components/FiltreMots.jsx
 import React, { useState, useEffect } from "react";
 import "./FiltreMots.css";
 
@@ -15,6 +15,7 @@ export default function FiltreMots({
   setMinLength,
   maxLength,
   setMaxLength,
+  onReset,
 }) {
   const [errorLength, setErrorLength] = useState("");
 
@@ -33,14 +34,9 @@ export default function FiltreMots({
     }
   }, [minLength, maxLength]);
 
-  // Réinitialiser tous les filtres
+  // Handler de reset passe par la callback parent
   const handleReset = () => {
-    setSearch("");
-    setLettresObligatoires("");
-    setLettresInterdites("");
-    setFinMot("");
-    setMinLength("2");
-    setMaxLength("8");
+    onReset();
   };
 
   return (
@@ -75,8 +71,8 @@ export default function FiltreMots({
           <input
             type="text"
             id="searchContains"
-            autoComplete="off"
             className="form-control input-success"
+            autoComplete="off"
             value={lettresObligatoires}
             onChange={(e) => setLettresObligatoires(e.target.value)}
           />
@@ -93,8 +89,8 @@ export default function FiltreMots({
           <input
             type="text"
             id="searchExcludes"
-            autoComplete="off"
             className="form-control input-danger"
+            autoComplete="off"
             value={lettresInterdites}
             onChange={(e) => setLettresInterdites(e.target.value)}
           />
@@ -111,15 +107,14 @@ export default function FiltreMots({
           <input
             type="text"
             id="searchEndsWith"
-            autoComplete="off"
             className="form-control input-primary"
+            autoComplete="off"
             value={finMot}
             onChange={(e) => setFinMot(e.target.value)}
           />
         </div>
 
         {/* Longueurs min / max */}
-        {/* Flex centré pour min/max sur tous les écrans */}
         <div className="d-flex justify-content-center gap-3 mt-3">
           <div className="flex-shrink-1" style={{ maxWidth: "260px" }}>
             <input
@@ -134,7 +129,6 @@ export default function FiltreMots({
               aria-describedby="error-length"
             />
           </div>
-
           <div className="flex-shrink-1" style={{ maxWidth: "260px" }}>
             <input
               type="number"
@@ -156,7 +150,7 @@ export default function FiltreMots({
           {errorLength}
         </div>
       )}
-      {/* Bouton Réinitialiser */}
+
       <div className="mt-3 text-center">
         <button
           className="btn btn-gradient btn-sm"
