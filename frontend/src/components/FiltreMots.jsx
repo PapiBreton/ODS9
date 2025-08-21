@@ -44,7 +44,7 @@ export default function FiltreMots({
   };
 
   return (
-    <div className="card filtre-card p-3 mb-4 shadow-sm">
+    <div className="card filtre-card p-3 mb-3 shadow-sm">
       <div className="row g-3 align-items-end">
         {/* Commence par */}
         <div className="col-12 col-md-6 col-lg-3">
@@ -70,7 +70,7 @@ export default function FiltreMots({
             htmlFor="searchContains"
             className="form-label fw-bold text-success"
           >
-            Contient
+            Obligatoires
           </label>
           <input
             type="text"
@@ -88,7 +88,7 @@ export default function FiltreMots({
             htmlFor="searchExcludes"
             className="form-label fw-bold text-danger"
           >
-            Sans lettres
+            Interdites
           </label>
           <input
             type="text"

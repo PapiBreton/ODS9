@@ -1,37 +1,31 @@
-import { useState, useEffect, useCallback } from "react";
+// src/pages/Liste.jsx
+import { useState, useEffect, useCallback, useRef } from "react";
 import Navbar from "../components/Navbar";
 import FiltreMots from "../components/FiltreMots";
 import MotList from "../components/MotList";
-import Pagination from "../components/Pagination";
 import AnagramModal from "../components/AnagramModal";
 import useAnagrams from "../utils/useAnagrammes";
 
 export default function Liste() {
   const { fetchAnagrams } = useAnagrams();
+
+  // pagination & data
   const [mots, setMots] = useState([]);
   const [page, setPage] = useState(1);
+  const [limit] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [totalMots, setTotalMots] = useState(0);
 
-  // Filtres
+  // filtres
   const [search, setSearch] = useState("");
   const [lettresObligatoires, setLettresObligatoires] = useState("");
   const [lettresInterdites, setLettresInterdites] = useState("");
   const [finMot, setFinMot] = useState("");
-  // src/pages/Liste.jsx
   const [minLength, setMinLength] = useState("2");
   const [maxLength, setMaxLength] = useState("8");
 
+  // debounce sur la recherche
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [motPourAnagrammes, setMotPourAnagrammes] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [modalAnas, setModalAnas] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const limit = 15;
-
-  // Débounce sur la recherche
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -40,12 +34,12 @@ export default function Liste() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Récupération des mots
+  // sentinel pour infinite scroll
+  const loaderRef = useRef(null);
+
+  // fetch des mots (remplace ou concatène selon page)
   const fetchMots = useCallback(async () => {
     try {
-      setError(null);
-      setLoading(true);
-
       const params = new URLSearchParams({
         page,
         limit,
@@ -56,18 +50,17 @@ export default function Liste() {
         minLength,
         maxLength,
       });
-      const res = await fetch(`/api/mots?${params.toString()}`);
-      if (!res.ok) throw new Error("Erreur lors du chargement des mots");
 
-      const data = await res.json();
-      setMots(data.mots);
-      setTotalPages(data.totalPages);
-      setTotalMots(data.total);
+      const res = await fetch(`/api/mots?${params.toString()}`);
+      if (!res.ok) throw new Error("Erreur de réseau");
+
+      const { mots: newMots, totalPages: tp, total } = await res.json();
+      setTotalPages(tp);
+      setTotalMots(total);
+
+      setMots((prev) => (page === 1 ? newMots : [...prev, ...newMots]));
     } catch (err) {
       console.error(err);
-      setError("Impossible de charger les données.");
-    } finally {
-      setLoading(false);
     }
   }, [
     page,
@@ -80,11 +73,43 @@ export default function Liste() {
     maxLength,
   ]);
 
+  // déclencher le fetch
   useEffect(() => {
     fetchMots();
   }, [fetchMots]);
 
-  // Ouverture modale anagrammes
+  // reset liste au changement de filtres
+  useEffect(() => {
+    setMots([]);
+  }, [
+    debouncedSearch,
+    lettresObligatoires,
+    lettresInterdites,
+    finMot,
+    minLength,
+    maxLength,
+  ]);
+
+  // infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (page >= totalPages) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPage((p) => Math.min(p + 1, totalPages));
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [page, totalPages]);
+
+  // modal anagrammes
+  const [showModal, setShowModal] = useState(false);
+  const [modalAnas, setModalAnas] = useState([]);
+  const [motPourAnagrammes, setMotPourAnagrammes] = useState("");
+
   const handleShowAnagrams = async (mot) => {
     const anas = await fetchAnagrams(mot);
     setModalAnas(anas);
@@ -92,16 +117,29 @@ export default function Liste() {
     setShowModal(true);
   };
 
-  // Fermeture modale
   const handleCloseModal = () => {
     setShowModal(false);
     setModalAnas([]);
     setMotPourAnagrammes("");
   };
 
+  // reset des filtres
+  const handleResetFilters = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setLettresObligatoires("");
+    setLettresInterdites("");
+    setFinMot("");
+    setMinLength("2");
+    setMaxLength("8");
+    setPage(1);
+    setMots([]);
+  };
+
   return (
     <>
       <Navbar />
+
       <div className="container py-4">
         <h3 className="mb-4 text-center">📘 ODS-9 sans conjugaisons</h3>
 
@@ -120,26 +158,24 @@ export default function Liste() {
           setMaxLength={setMaxLength}
         />
 
-        {loading && <p className="text-center text-info">Chargement...</p>}
-        {error && <p className="text-danger text-center">{error}</p>}
-        {!loading && !error && mots.length === 0 && (
-          <p className="text-center text-muted">Aucun mot trouvé.</p>
-        )}
+        <div className="mb-2 text-center">
+          {totalMots > 5 && (
+            <p className="mt-1 text-secondary">Total : {totalMots} mots</p>
+          )}
+        </div>
 
         <MotList mots={mots} onMotClick={handleShowAnagrams} />
 
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onFirst={() => setPage(1)}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-          onLast={() => setPage(totalPages)}
-        />
+        <div ref={loaderRef} style={{ height: 1 }} />
 
-        <p className="mt-3 text-secondary text-center">
-          Nombre total de mots : {totalMots}
-        </p>
+        {page < totalPages && (
+          <p className="text-center text-info">Chargement...</p>
+        )}
+        {page >= totalPages && (
+          <p className="text-center text-muted">
+            Vous avez atteint la fin ({totalMots} mots).
+          </p>
+        )}
       </div>
 
       <AnagramModal
