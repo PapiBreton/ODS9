@@ -5,18 +5,17 @@ import FiltreMots from "../components/FiltreMots";
 import MotList from "../components/MotList";
 import AnagramModal from "../components/AnagramModal";
 import useAnagrams from "../utils/useAnagrammes";
+import RajoutsModal from "../components/RajoutsModal";
 
 export default function Liste() {
   const { fetchAnagrams } = useAnagrams();
 
-  // pagination & data
   const [mots, setMots] = useState([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [totalMots, setTotalMots] = useState(0);
 
-  // filtres
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [lettresObligatoires, setLettresObligatoires] = useState("");
@@ -25,7 +24,6 @@ export default function Liste() {
   const [minLength, setMinLength] = useState("2");
   const [maxLength, setMaxLength] = useState("8");
 
-  // debounce sur la recherche
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -34,7 +32,6 @@ export default function Liste() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // reset liste et page à chaque changement de filtre
   useEffect(() => {
     setMots([]);
     setPage(1);
@@ -47,7 +44,6 @@ export default function Liste() {
     maxLength,
   ]);
 
-  // fetch des mots (remplace ou concatène selon page)
   const fetchMots = useCallback(async () => {
     try {
       const params = new URLSearchParams({
@@ -82,12 +78,10 @@ export default function Liste() {
     maxLength,
   ]);
 
-  // déclencher le fetch
   useEffect(() => {
     fetchMots();
   }, [fetchMots]);
 
-  // infinite scroll via IntersectionObserver
   const loaderRef = useRef(null);
   useEffect(() => {
     if (page >= totalPages) return;
@@ -103,7 +97,6 @@ export default function Liste() {
     return () => observer.disconnect();
   }, [page, totalPages]);
 
-  // modal anagrammes
   const [showModal, setShowModal] = useState(false);
   const [modalAnas, setModalAnas] = useState([]);
   const [motPourAnagrammes, setMotPourAnagrammes] = useState("");
@@ -121,7 +114,6 @@ export default function Liste() {
     setMotPourAnagrammes("");
   };
 
-  // Réinitialisation globale filtres + pagination + scroll + debounce
   const handleResetAll = () => {
     setSearch("");
     setDebouncedSearch("");
@@ -134,10 +126,24 @@ export default function Liste() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const [rajouts, setRajouts] = useState([]);
+  const [showRajoutsModal, setShowRajoutsModal] = useState(false);
+
+  const handleShowRajouts = async (mot) => {
+    try {
+      const res = await fetch(`/api/dicoComplet/${encodeURIComponent(mot)}`);
+      const result = await res.json();
+      setRajouts(result.data || []);
+    } catch (err) {
+      console.error("Erreur:", err);
+      setRajouts([]);
+    }
+    setShowRajoutsModal(true);
+  };
+
   return (
     <>
       <Navbar />
-
       <div className="container py-4">
         <h3 className="mb-4 text-center">📘 ODS-9 sans conjugaisons</h3>
 
@@ -163,7 +169,11 @@ export default function Liste() {
           )}
         </div>
 
-        <MotList mots={mots} onMotClick={handleShowAnagrams} />
+        <MotList
+          mots={mots}
+          onMotClick={handleShowAnagrams}
+          onRajoutsClick={handleShowRajouts}
+        />
 
         <div ref={loaderRef} style={{ height: 1 }} />
 
@@ -188,6 +198,12 @@ export default function Liste() {
         anagrammes={modalAnas}
         onClose={handleCloseModal}
         motPourAnagrammes={motPourAnagrammes}
+      />
+
+      <RajoutsModal
+        show={showRajoutsModal}
+        handleClose={() => setShowRajoutsModal(false)}
+        mots={rajouts}
       />
     </>
   );

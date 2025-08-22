@@ -99,3 +99,8 @@
   background: linear-gradient(90deg, #fff8dc 0%, #fff3b0 100%);
   transition: background 0.3s ease;
 }
+no-bullets {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}

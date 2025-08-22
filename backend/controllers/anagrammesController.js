@@ -1,4 +1,4 @@
-const Anagrammes = require("../models/Anagrammes");
+const Anagrammes = require("../models/Anagrammes.js");
 
 // Route anagrammes
 // Rechercher un mot précis
