@@ -55,74 +55,78 @@ export default function Flashcard() {
   return (
     <>
       <Navbar />
-      <div
-        className="d-flex justify-content-center align-items-center vh-100"
-        style={{
-          background: "linear-gradient(135deg, #70657aff 0%, #5878afff 100%)",
-          padding: "1rem",
-        }}
-      >
-        <div
-          key={fadeKey}
-          className="card shadow-lg fade-in"
-          style={{
-            width: "100%",
-            maxWidth: "40rem",
-            borderRadius: "1rem",
-            backgroundColor: "rgba(145, 117, 117, 0.9)",
-          }}
-        >
-          <div className="card-body text-center p-4">
-            <h2>MODIFIER LA SOLUTION DANS MONGO</h2>
-            {/* On affiche l'indice : le mot tronqué ou autre info */}
-            <p
-              className="display-4 fw-bold mb-4"
-              style={{ color: "rgba(72, 61, 88, 0.9)" }}
-            >
-              {flashcard.word}
-            </p>
 
-            <form onSubmit={handleSubmit} className="mt-4">
-              <div className="input-group mb-3">
-                <input
-                  ref={inputRef}
-                  id="answer-input"
-                  autoComplete="off"
-                  type="text"
-                  className="form-control text-center"
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value.toUpperCase())}
-                />
-              </div>
-            </form>
+      <div className="d-flex flex-column">
+        {/* Titre en haut */}
+        <div className="text-center py-4">
+          <h3 className="mb-5">🚀 Entraînement express</h3>
+        </div>
 
-            {showSolution && (
-              <div
-                className={`alert ${
-                  isCorrect ? "alert-success" : "alert-danger"
-                } mt-3`}
+        {/* Carte centrée verticalement */}
+        <div className="d-flex justify-content-center mt-5">
+          <div
+            key={fadeKey}
+            className="card shadow-lg fade-in"
+            style={{
+              width: "100%",
+              maxWidth: "40rem",
+              borderRadius: "1rem",
+              backgroundColor: "rgba(145, 117, 117, 0.9)",
+            }}
+          >
+            <div className="card-body text-center p-4">
+              <p
+                className="display-4 fw-bold mb-4"
+                style={{ color: "rgba(72, 61, 88, 0.9)" }}
               >
-                {isCorrect ? (
-                  <>
-                    ✅ <strong>{flashcard.solution}</strong>
-                  </>
-                ) : (
-                  <>
-                    ❌ Réponse attendue : <strong>{flashcard.solution}</strong>
-                  </>
-                )}
-              </div>
-            )}
+                {flashcard.word}
+              </p>
 
-            {showSolution && (
-              <button
-                ref={nextBtnRef}
-                className="btn btn-outline mt-3"
-                onClick={fetchFlashcard}
-              >
-                Carte suivante
-              </button>
-            )}
+              <form onSubmit={handleSubmit} className="mt-4">
+                <div className="input-group mb-3">
+                  <input
+                    ref={inputRef}
+                    id="answer-input"
+                    autoComplete="off"
+                    type="text"
+                    className="form-control text-center"
+                    value={userAnswer}
+                    onChange={(e) =>
+                      setUserAnswer(e.target.value.toUpperCase())
+                    }
+                  />
+                </div>
+              </form>
+
+              {showSolution && (
+                <div
+                  className={`alert ${
+                    isCorrect ? "alert-success" : "alert-danger"
+                  } mt-3`}
+                >
+                  {isCorrect ? (
+                    <>
+                      ✅ <strong>{flashcard.solution}</strong>
+                    </>
+                  ) : (
+                    <>
+                      ❌ Réponse attendue :{" "}
+                      <strong>{flashcard.solution}</strong>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {showSolution && (
+                <button
+                  ref={nextBtnRef}
+                  className="btn btn-outline mt-3"
+                  onClick={fetchFlashcard}
+                >
+                  Carte suivante
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

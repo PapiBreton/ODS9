@@ -120,7 +120,7 @@ const Prefixlist = () => {
           ))}
         </div>
 
-        <h5 className="mb-4 text-center">
+        <h5 className="mb-3 text-center">
           Lettre sélectionnée : {currentLetter}
         </h5>
 
