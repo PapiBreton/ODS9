@@ -15,7 +15,7 @@ export default function Liste() {
   const [limit] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [totalMots, setTotalMots] = useState(0);
-
+  const [motPourRajouts, setMotPourRajouts] = useState("");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [lettresObligatoires, setLettresObligatoires] = useState("");
@@ -131,6 +131,7 @@ export default function Liste() {
 
   const handleShowRajouts = async (mot) => {
     try {
+      setMotPourRajouts(mot);
       const res = await fetch(`/api/dicoComplet/${encodeURIComponent(mot)}`);
       const result = await res.json();
       setRajouts(result.data || []);
@@ -204,6 +205,7 @@ export default function Liste() {
         show={showRajoutsModal}
         handleClose={() => setShowRajoutsModal(false)}
         mots={rajouts}
+        motPourRajouts={motPourRajouts}
       />
     </>
   );

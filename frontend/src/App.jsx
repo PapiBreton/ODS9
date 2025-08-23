@@ -2,7 +2,8 @@ import { Routes, Route, Navigate } from "react-router";
 import "./styles/main.scss";
 import Liste from "./components/Liste";
 import Recherche from "./components/Recherche";
-
+import Prefixes from "./components/prefix/Flashcard";
+import PrefixesListe from "./components/prefix/Prefixlist";
 function App() {
   return (
     <>
@@ -11,6 +12,8 @@ function App() {
         <Route path="/" element={<Navigate to="/dico" replace />} />
         <Route path="/dico" element={<Liste />}></Route>
         <Route path="/recherche" element={<Recherche />}></Route>
+        <Route path="/prefix" element={<Prefixes />}></Route>
+        <Route path="/listePrefixes" element={<PrefixesListe />}></Route>
         <Route path="*" element={<Liste />} />
       </Routes>
     </>

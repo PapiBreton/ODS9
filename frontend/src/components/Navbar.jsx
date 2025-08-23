@@ -34,12 +34,22 @@ export default function Navbar() {
             </li>
             <li className="nav-item">
               <NavLink
-                to="/anagrammes"
+                to="/prefix"
                 className={({ isActive }) =>
                   `nav-link hover-underline ${isActive ? "active" : ""}`
                 }
               >
-                Tirages
+                Préfixes
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/listePrefixes"
+                className={({ isActive }) =>
+                  `nav-link hover-underline ${isActive ? "active" : ""}`
+                }
+              >
+                Liste Préfixes
               </NavLink>
             </li>
             <li className="nav-item">
