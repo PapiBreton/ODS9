@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import EditModal from "./EditModal";
 import PrefixTable from "./PrefixTable";
-
+import Navbar from "../Navbar";
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 const Prefixlist = () => {
@@ -98,84 +98,91 @@ const Prefixlist = () => {
   };
 
   return (
-    <div className="container my-4">
-      <h2 className="mb-3">📚 Préfixes par lettre</h2>
+    <>
+      <Navbar />
+      <div className="container my-4">
+        <h3 className="mb-4 text-center">📚 Préfixes par lettre</h3>
 
-      <div className="mb-3 d-flex flex-wrap">
-        {alphabet.map((letter) => (
-          <button
-            key={letter}
-            className={`btn me-2 mb-2 ${
-              currentLetter === letter ? "btn-primary" : "btn-outline-secondary"
-            }`}
-            disabled={!letterCounts || letterCounts[letter] === 0}
-            onClick={() => setCurrentLetter(letter)}
-          >
-            {letter} ({letterCounts?.[letter] ?? 0})
-          </button>
-        ))}
-      </div>
+        <div className="mb-3 d-flex flex-wrap">
+          {alphabet.map((letter) => (
+            <button
+              key={letter}
+              className={`btn me-2 mb-2 ${
+                currentLetter === letter
+                  ? "btn-primary"
+                  : "btn-outline-secondary"
+              }`}
+              disabled={!letterCounts || letterCounts[letter] === 0}
+              onClick={() => setCurrentLetter(letter)}
+            >
+              {letter} ({letterCounts?.[letter] ?? 0})
+            </button>
+          ))}
+        </div>
 
-      <h5 className="mb-3">Lettre sélectionnée : {currentLetter}</h5>
+        <h5 className="mb-4 text-center">
+          Lettre sélectionnée : {currentLetter}
+        </h5>
 
-      {loading ? (
-        <p>Chargement des mots...</p>
-      ) : prefixes.length === 0 ? (
-        <p>Aucun mot trouvé pour cette lettre.</p>
-      ) : (
-        <PrefixTable
-          prefixes={prefixes}
-          onEdit={openEditModal}
-          onDelete={handleDeleteClick}
-        />
-      )}
+        {loading ? (
+          <p>Chargement des mots...</p>
+        ) : prefixes.length === 0 ? (
+          <p>Aucun mot trouvé pour cette lettre.</p>
+        ) : (
+          <PrefixTable
+            prefixes={prefixes}
+            onEdit={openEditModal}
+            onDelete={handleDeleteClick}
+          />
+        )}
 
-      {selectedPrefix && (
-        <EditModal
-          item={selectedPrefix}
-          word={editWord}
-          solution={editSolution}
-          onChangeWord={setEditWord}
-          onChangeSolution={setEditSolution}
-          onClose={() => setSelectedPrefix(null)}
-          onSave={saveEdit}
-        />
-      )}
+        {selectedPrefix && (
+          <EditModal
+            item={selectedPrefix}
+            word={editWord}
+            solution={editSolution}
+            onChangeWord={setEditWord}
+            onChangeSolution={setEditSolution}
+            onClose={() => setSelectedPrefix(null)}
+            onSave={saveEdit}
+          />
+        )}
 
-      {showConfirmModal && (
-        <div className="modal show d-block" tabIndex="-1">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Confirmer la suppression</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowConfirmModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <p>
-                  Voulez-vous vraiment supprimer le mot{" "}
-                  <strong>{prefixToDelete?.word}</strong> ?
-                </p>
-              </div>
-              <div className="modal-footer">
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => setShowConfirmModal(false)}
-                >
-                  Annuler
-                </button>
-                <button className="btn btn-danger" onClick={confirmDelete}>
-                  Supprimer
-                </button>
+        {showConfirmModal && (
+          <div className="modal show d-block" tabIndex="-1">
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Confirmer la suppression</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowConfirmModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <p>
+                    Voulez-vous vraiment supprimer le mot{" "}
+                    <strong>{prefixToDelete?.word}</strong> ?
+                  </p>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setShowConfirmModal(false)}
+                  >
+                    Annuler
+                  </button>
+                  <button className="btn btn-danger" onClick={confirmDelete}>
+                    Supprimer
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 
