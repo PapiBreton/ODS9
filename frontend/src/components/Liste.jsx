@@ -5,17 +5,14 @@ import FiltreMots from "../components/FiltreMots";
 import MotList from "../components/MotList";
 import AnagramModal from "../components/AnagramModal";
 import useAnagrams from "../utils/useAnagrammes";
-import RajoutsModal from "../components/RajoutsModal";
 
 export default function Liste() {
   const { fetchAnagrams } = useAnagrams();
-
   const [mots, setMots] = useState([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [totalMots, setTotalMots] = useState(0);
-  const [motPourRajouts, setMotPourRajouts] = useState("");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [lettresObligatoires, setLettresObligatoires] = useState("");
@@ -24,6 +21,7 @@ export default function Liste() {
   const [minLength, setMinLength] = useState("2");
   const [maxLength, setMaxLength] = useState("8");
 
+  // Déclenchement différé de la recherche
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -32,6 +30,7 @@ export default function Liste() {
     return () => clearTimeout(timer);
   }, [search]);
 
+  // Réinitialisation des résultats quand les filtres changent
   useEffect(() => {
     setMots([]);
     setPage(1);
@@ -44,6 +43,7 @@ export default function Liste() {
     maxLength,
   ]);
 
+  // Récupération des mots depuis l'API
   const fetchMots = useCallback(async () => {
     try {
       const params = new URLSearchParams({
@@ -61,9 +61,28 @@ export default function Liste() {
       if (!res.ok) throw new Error("Erreur de réseau");
 
       const { mots: newMots, totalPages: tp, total } = await res.json();
+      // Normalisation : on s'assure que chaque élément est { id, mot }
+      const motsNormalises = newMots.map((item, index) => {
+        if (typeof item === "object" && item !== null) {
+          return {
+            id: item._id || `${item.mot}-${page}-${index}`,
+            mot: item.mot,
+            definition: item.definition || "",
+            anagramCount: item.anagramCount || 0,
+            normalized: item.normalized || "",
+          };
+        }
+        return {
+          id: `${item}-${page}-${index}`,
+          mot: item,
+        };
+      });
+
       setTotalPages(tp);
       setTotalMots(total);
-      setMots((prev) => (page === 1 ? newMots : [...prev, ...newMots]));
+      setMots((prev) =>
+        page === 1 ? motsNormalises : [...prev, ...motsNormalises]
+      );
     } catch (err) {
       console.error(err);
     }
@@ -82,6 +101,7 @@ export default function Liste() {
     fetchMots();
   }, [fetchMots]);
 
+  // Scroll infini
   const loaderRef = useRef(null);
   useEffect(() => {
     if (page >= totalPages) return;
@@ -97,6 +117,7 @@ export default function Liste() {
     return () => observer.disconnect();
   }, [page, totalPages]);
 
+  // Gestion de la modale d’anagrammes
   const [showModal, setShowModal] = useState(false);
   const [modalAnas, setModalAnas] = useState([]);
   const [motPourAnagrammes, setMotPourAnagrammes] = useState("");
@@ -114,6 +135,7 @@ export default function Liste() {
     setMotPourAnagrammes("");
   };
 
+  // Réinitialisation des filtres
   const handleResetAll = () => {
     setSearch("");
     setDebouncedSearch("");
@@ -124,22 +146,6 @@ export default function Liste() {
     setMaxLength("8");
     setPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const [rajouts, setRajouts] = useState([]);
-  const [showRajoutsModal, setShowRajoutsModal] = useState(false);
-
-  const handleShowRajouts = async (mot) => {
-    try {
-      setMotPourRajouts(mot);
-      const res = await fetch(`/api/dicoComplet/${encodeURIComponent(mot)}`);
-      const result = await res.json();
-      setRajouts(result.data || []);
-    } catch (err) {
-      console.error("Erreur:", err);
-      setRajouts([]);
-    }
-    setShowRajoutsModal(true);
   };
 
   return (
@@ -170,11 +176,7 @@ export default function Liste() {
           )}
         </div>
 
-        <MotList
-          mots={mots}
-          onMotClick={handleShowAnagrams}
-          onRajoutsClick={handleShowRajouts}
-        />
+        <MotList mots={mots} onMotClick={handleShowAnagrams} />
 
         <div ref={loaderRef} style={{ height: 1 }} />
 
@@ -182,7 +184,7 @@ export default function Liste() {
           <p className="text-center text-info">Chargement...</p>
         )}
         {totalMots > 0 && page >= totalPages && (
-          <p className="text-center text-white">
+          <p className="text-center text-white mt-3">
             Vous avez atteint la fin ({totalMots}{" "}
             {totalMots === 1 ? "mot" : "mots"}).
           </p>
@@ -199,13 +201,6 @@ export default function Liste() {
         anagrammes={modalAnas}
         onClose={handleCloseModal}
         motPourAnagrammes={motPourAnagrammes}
-      />
-
-      <RajoutsModal
-        show={showRajoutsModal}
-        handleClose={() => setShowRajoutsModal(false)}
-        mots={rajouts}
-        motPourRajouts={motPourRajouts}
       />
     </>
   );

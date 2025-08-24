@@ -1,25 +1,41 @@
-import { Modal, Button, ListGroup, ListGroupItem } from "react-bootstrap";
-import "./styles.css";
-const RajoutsModal = ({ show, handleClose, mots, motPourRajouts }) => {
+// src/components/RajoutsModal.jsx
+import { Modal, Button } from "react-bootstrap";
+
+export default function RajoutsModal({
+  show,
+  handleClose,
+  mots,
+  motPourRajouts,
+}) {
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} centered size="md">
       <Modal.Header closeButton>
-        <Modal.Title>Rajouts</Modal.Title>
+        <Modal.Title>
+          Rajouts possibles pour{" "}
+          <span className="text-primary">{motPourRajouts}</span>
+        </Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
-        {mots.length === 0 ? (
-          <p>
-            Aucun rajout trouvé avec{" "}
-            <span className="fw-bold">{motPourRajouts}</span>.
-          </p>
+        {mots && mots.length > 0 ? (
+          <ul className="list-group">
+            {mots.map((mot, index) => {
+              // Gestion des deux formats : string ou objet
+              const texteMot =
+                typeof mot === "object" && mot !== null ? mot.mot : mot;
+
+              return (
+                <li key={`${texteMot}-${index}`} className="list-group-item">
+                  {texteMot}
+                </li>
+              );
+            })}
+          </ul>
         ) : (
-          <ListGroup>
-            {mots.map((mot, index) => (
-              <ListGroup.Item key={index}>{mot}</ListGroup.Item>
-            ))}
-          </ListGroup>
+          <p className="text-muted mb-0">Aucun rajout trouvé pour ce mot.</p>
         )}
       </Modal.Body>
+
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Fermer
@@ -27,6 +43,4 @@ const RajoutsModal = ({ show, handleClose, mots, motPourRajouts }) => {
       </Modal.Footer>
     </Modal>
   );
-};
-
-export default RajoutsModal;
+}

@@ -38,7 +38,7 @@ exports.getRajouts = async (req, res) => {
       .filter((mot) => mot.toLowerCase() !== searchTerm.toLowerCase());
 
     if (motsTrouves.length === 0) {
-      return res.status(404).json({ data: [] });
+      return res.json({ data: [] });
     }
     res.json({ data: motsTrouves });
   } catch (error) {

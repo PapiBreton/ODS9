@@ -1,76 +1,126 @@
-import React, { useState } from "react";
+// src/components/MotList.jsx
+import { useState } from "react";
 import IconButton from "./IconButton";
+import RajoutsModal from "./RajoutsModal";
 import "./styles.css";
 
-export default function MotList({ mots, onMotClick, onRajoutsClick }) {
+export default function MotList({ mots, onMotClick }) {
+  // MODAL RAJOUTS
+  const [rajoutsModal, setRajoutsModal] = useState({
+    visible: false,
+    mot: "",
+    motsRajoutes: [],
+  });
+
+  // Ouvre la modale avec les rajouts pour un mot donné
+  const handleShowRajouts = async (motTexte) => {
+    try {
+      const res = await fetch(
+        `/api/dicoComplet/${encodeURIComponent(motTexte)}`
+      );
+      if (!res.ok) throw new Error("Erreur réseau");
+      const result = await res.json();
+      setRajoutsModal({
+        visible: true,
+        mot: motTexte,
+        motsRajoutes: result.data || [],
+      });
+    } catch {
+      setRajoutsModal({
+        visible: true,
+        mot: motTexte,
+        motsRajoutes: [],
+      });
+    }
+  };
+
+  const handleCloseRajouts = () => {
+    setRajoutsModal({
+      visible: false,
+      mot: "",
+      motsRajoutes: [],
+    });
+  };
+  // Définition de l'état pour gérer l'affichage des définitions
   const [openDefs, setOpenDefs] = useState({});
 
   const toggleDefinition = (id) => {
     setOpenDefs((prev) => ({ ...prev, [id]: !prev[id] }));
   };
-
   return (
-    <ul className="list-group">
-      {mots.map((mot) => {
-        const isOpen = !!openDefs[mot._id];
-        const hasAnas = mot.anagramCount > 1;
-
-        return (
-          <li className="list-group-item pb-0 li-mot" key={mot._id}>
-            <div className="ligne-principale">
-              {/* Colonne mot */}
-              <IconButton
-                className="mot-col"
-                onClick={() => hasAnas && onMotClick(mot.normalized)}
-                disabled={!hasAnas}
-              >
-                <span
-                  className={`mot-texte fw-bold ${
-                    hasAnas ? "text-primary" : "text-black"
-                  }`}
+    <>
+      <ul className="list-group">
+        {mots.map(({ id, mot, definition, anagramCount, normalized }) => {
+          const isOpen = !!openDefs[id];
+          const hasAnas = anagramCount > 1;
+          return (
+            <li key={id} className="list-group-item pb-0 li-mot">
+              <div className="ligne-principale">
+                {/* Colonne mot */}
+                <IconButton
+                  className="mot-col"
+                  onClick={() => hasAnas && onMotClick(normalized)}
+                  disabled={!hasAnas}
                 >
-                  {mot.mot}
+                  <span
+                    className={`mot-texte fw-bold ${
+                      hasAnas ? "text-primary" : "text-black"
+                    }`}
+                  >
+                    {mot}
+                  </span>
+                </IconButton>
+
+                {/* Compteur d'anagrammes */}
+                <span className="count">
+                  {hasAnas && <small>+ {anagramCount - 1}</small>}
                 </span>
-              </IconButton>
 
-              {/* Compteur d'anagrammes */}
-              <span className="count">
-                {hasAnas && <small>{mot.anagramCount}</small>}
-              </span>
+                {/* Icône définition */}
+                <IconButton
+                  className="def-col"
+                  title="Voir définition"
+                  onClick={() => toggleDefinition(id)}
+                  ariaExpanded={isOpen}
+                >
+                  <span className={`arrow-icon ${isOpen ? "open" : ""}`}>
+                    📖
+                  </span>
+                </IconButton>
 
-              {/* Icône définition */}
-              <IconButton
-                className="def-col"
-                title="Voir définition"
-                onClick={() => toggleDefinition(mot._id)}
-                ariaExpanded={isOpen}
+                {/* Bouton Rajouts */}
+                <button
+                  className="btn btn-outline-danger btn-sm btn-cacher mb-2"
+                  onClick={() => handleShowRajouts(mot)}
+                  title="Rajouts"
+                >
+                  <span className="d-inline d-sm-none">Rajouts</span>
+                  <span className="d-none d-sm-inline">Rajouts</span>
+                </button>
+              </div>
+
+              {/* Définition affichée */}
+              <div
+                className={`definition-inline ${isOpen ? "show" : ""}`}
+                id={"mot-definition-" + mot._id}
               >
-                <span className={`arrow-icon ${isOpen ? "open" : ""}`}>📖</span>
-              </IconButton>
+                <small className="text-secondary">
+                  {definition || "Pas de définition disponible."}
+                </small>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
 
-              {/* Bouton Rajouts */}
-              <button
-                className="btn btn-outline-danger btn-sm btn-cacher mb-2"
-                onClick={() => onRajoutsClick(mot.mot)}
-                title="Rajouts"
-              >
-                <span className="d-inline d-sm-none">Rajouts</span>
-                <span className="d-none d-sm-inline">Rajouts</span>
-              </button>
-            </div>
-
-            {/* Définition affichée */}
-            <div
-              className={`definition-inline ${isOpen ? "show" : ""}`}
-              id={"mot-definition-" + mot._id}
-            >
-              <small className="text-secondary">
-                {mot.definition || "Pas de définition disponible."}
-              </small>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+      {rajoutsModal.visible && (
+        <RajoutsModal
+          show={rajoutsModal.visible}
+          handleClose={handleCloseRajouts}
+          mots={rajoutsModal.motsRajoutes}
+          motPourRajouts={rajoutsModal.mot}
+        />
+      )}
+    </>
   );
 }
