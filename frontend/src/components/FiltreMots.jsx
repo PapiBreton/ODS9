@@ -1,8 +1,8 @@
 // src/components/FiltreMots.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./FiltreMots.css";
 
-export default function FiltreMots({
+function FiltreMots({
   search,
   setSearch,
   lettresObligatoires,
@@ -34,10 +34,10 @@ export default function FiltreMots({
     }
   }, [minLength, maxLength]);
 
-  // Handler de reset passe par la callback parent
-  const handleReset = () => {
+  // Handler de reset stabilisé
+  const handleReset = useCallback(() => {
     onReset();
-  };
+  }, [onReset]);
 
   return (
     <div className="card filtre-card p-3 mb-3 shadow-sm">
@@ -163,3 +163,16 @@ export default function FiltreMots({
     </div>
   );
 }
+
+// Empêche le re-rendu si les props n'ont pas changé
+export default React.memo(FiltreMots, (prevProps, nextProps) => {
+  return (
+    prevProps.search === nextProps.search &&
+    prevProps.lettresObligatoires === nextProps.lettresObligatoires &&
+    prevProps.lettresInterdites === nextProps.lettresInterdites &&
+    prevProps.finMot === nextProps.finMot &&
+    prevProps.minLength === nextProps.minLength &&
+    prevProps.maxLength === nextProps.maxLength &&
+    prevProps.onReset === nextProps.onReset
+  );
+});

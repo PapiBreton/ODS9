@@ -1,10 +1,10 @@
 // src/components/MotList.jsx
-import { useState } from "react";
+import { useState, memo } from "react";
 import IconButton from "./IconButton";
 import RajoutsModal from "./RajoutsModal";
 import "./styles.css";
 
-export default function MotList({ mots, onMotClick }) {
+function MotList({ mots, onMotClick }) {
   // MODAL RAJOUTS
   const [rajoutsModal, setRajoutsModal] = useState({
     visible: false,
@@ -124,3 +124,11 @@ export default function MotList({ mots, onMotClick }) {
     </>
   );
 }
+
+// Empêche le re-rendu si les props n'ont pas changé
+export default memo(MotList, (prevProps, nextProps) => {
+  return (
+    prevProps.mots === nextProps.mots &&
+    prevProps.onMotClick === nextProps.onMotClick
+  );
+});

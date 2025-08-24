@@ -1,12 +1,10 @@
+// src/components/AnagramModal.jsx
+import React from "react";
 import "./modal.css";
-// components/AnagramModal.js
-export default function AnagramModal({
-  show,
-  motPourAnagrammes,
-  anagrammes,
-  onClose,
-}) {
+
+function AnagramModal({ show, motPourAnagrammes, anagrammes, onClose }) {
   if (!show) return null;
+
   return (
     <>
       <div
@@ -56,3 +54,14 @@ export default function AnagramModal({
     </>
   );
 }
+
+// Empêche le re-rendu si les props n'ont pas changé
+export default React.memo(AnagramModal, (prevProps, nextProps) => {
+  return (
+    prevProps.show === nextProps.show &&
+    prevProps.motPourAnagrammes === nextProps.motPourAnagrammes &&
+    prevProps.onClose === nextProps.onClose &&
+    prevProps.anagrammes.length === nextProps.anagrammes.length &&
+    prevProps.anagrammes.every((val, idx) => val === nextProps.anagrammes[idx])
+  );
+});

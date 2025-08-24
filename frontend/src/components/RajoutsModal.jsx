@@ -8,11 +8,10 @@ export default function RajoutsModal({
   motPourRajouts,
 }) {
   return (
-    <Modal show={show} onHide={handleClose} centered size="md">
+    <Modal show={show} onHide={handleClose} centered size="sm">
       <Modal.Header closeButton>
         <Modal.Title>
-          Rajouts possibles pour{" "}
-          <span className="text-primary">{motPourRajouts}</span>
+          Rajouts pour <span className="text-primary">{motPourRajouts}</span>
         </Modal.Title>
       </Modal.Header>
 
