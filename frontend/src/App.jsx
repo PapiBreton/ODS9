@@ -4,6 +4,8 @@ import Liste from "./components/Liste";
 import Recherche from "./components/Recherche";
 import Prefixes from "./components/prefix/Flashcard";
 import PrefixesListe from "./components/prefix/Prefixlist";
+import QuizAna from "./components/quizAna/QuizAna";
+import AnagrammesJeu from "./components/plateau/AnagrammesJeu";
 function App() {
   return (
     <>
@@ -14,6 +16,8 @@ function App() {
         <Route path="/recherche" element={<Recherche />}></Route>
         <Route path="/prefix" element={<Prefixes />}></Route>
         <Route path="/listePrefixes" element={<PrefixesListe />}></Route>
+        <Route path="/anagrammesJeu" element={<AnagrammesJeu />}></Route>
+        //<Route path="/quizAna" element={<QuizAna />}></Route>
         <Route path="*" element={<Liste />} />
       </Routes>
     </>

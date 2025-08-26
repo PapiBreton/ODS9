@@ -13,6 +13,9 @@ app.use("/api/mots", require("./routes/mots"));
 app.use("/api/anagrammes", require("./routes/anagrammes"));
 app.use("/api/dicoComplet", require("./routes/dicoComplet"));
 app.use("/api/prefixes", require("./routes/prefixRoutes"));
+app.use("/api/quizAna", require("./routes/quizAna"));
+app.use("/api/quizAna", require("./routes/quizAna"));
+app.use("/api/anagrammesJeu", require("./routes/anagrammesJeu"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Serveur backend sur port ${PORT}`));

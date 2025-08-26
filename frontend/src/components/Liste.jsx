@@ -11,6 +11,7 @@ import Navbar from "../components/Navbar";
 import FiltreMots from "../components/FiltreMots";
 import MotList from "../components/MotList";
 import useAnagrams from "../utils/useAnagrams";
+import QuizMots from "../components/quizMots/QuizMots";
 
 // Lazy loading de la modale
 const AnagramModal = lazy(() => import("../components/AnagramModal"));
@@ -36,6 +37,9 @@ export default function Liste() {
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  //QuizMots
+  const [quizOpen, setQuizOpen] = useState(false);
 
   // Modale
   const [modalState, setModalState] = useState({
@@ -214,7 +218,11 @@ export default function Liste() {
             Total : {totalMots} mots
           </p>
         )}
-
+        <div className="text-center mb-3">
+          <button className="btn btn-primary" onClick={() => setQuizOpen(true)}>
+            🎲 QuizMots
+          </button>
+        </div>
         <MotList mots={mots} onMotClick={handleShowAnagrams} />
 
         <div ref={loaderRef} style={{ height: 1 }} />
@@ -245,6 +253,11 @@ export default function Liste() {
           />
         )}
       </Suspense>
+      <QuizMots
+        mots={mots}
+        show={quizOpen}
+        onClose={() => setQuizOpen(false)}
+      />
     </>
   );
 }

@@ -62,6 +62,26 @@ export default function Navbar() {
                 Rajouts
               </NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink
+                to="/quizAna"
+                className={({ isActive }) =>
+                  `nav-link hover-underline ${isActive ? "active" : ""}`
+                }
+              >
+                Quiz Anagrammes
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/anagrammesJeu"
+                className={({ isActive }) =>
+                  `nav-link hover-underline ${isActive ? "active" : ""}`
+                }
+              >
+                Anagrammes Jeu
+              </NavLink>
+            </li>
           </ul>
 
           {/* Recherche */}
