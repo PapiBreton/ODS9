@@ -123,3 +123,12 @@ fin-animation {
 .confetti-wrapper.fade-out {
   opacity: 0;
 }
+
+.mot-non-trouve {
+  color: rgb(192, 18, 18);
+  font-weight: bold;
+}
+.mot-trouve{
+  color: rgb(54, 119, 81);
+  font-weight: bold;
+}

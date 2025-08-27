@@ -46,7 +46,20 @@ export default function FinDuJeu({
           <p> 👀 Voici les mots qu'il fallait trouver :</p>
           {solutionsPossibles.map((sol, idx) => (
             <h4 key={idx} className="fw-bold">
-              <strong>+ {sol.lettre} :</strong> {sol.mots.join(", ")}
+              <strong>+ {sol.lettre} :</strong>{" "}
+              {sol.mots.map((mot, i) => (
+                <span
+                  key={i}
+                  className={
+                    solutionsTrouvees.includes(mot)
+                      ? "mot-trouve"
+                      : "mot-non-trouve"
+                  }
+                >
+                  {mot}
+                  {i < sol.mots.length - 1 ? ", " : ""}
+                </span>
+              ))}
             </h4>
           ))}
         </div>

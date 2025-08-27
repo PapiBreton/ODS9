@@ -39,7 +39,6 @@ export default function AnagrammesJeu() {
     setTirage(data.tirage);
     setLettresPlateau(data.lettresPlateau);
     setSolutionsPossibles(data.solutionsPossibles || []);
-    console.log("Solutions possibles:", data.solutionsPossibles);
     setSolutionsTrouvees([]);
     setJeuTermine(false);
     setMessageErreur("");

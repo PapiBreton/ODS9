@@ -10,6 +10,7 @@ export default function MotInputForm({
     >
       <input
         type="text"
+        id="input-solutions"
         autoComplete="off"
         className="form-control input-court mb-2"
         value={motProposé}
