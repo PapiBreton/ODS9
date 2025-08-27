@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import TimerDisplay from "./TimerDisplay";
 import ScrabbleTiles from "./ScrabbleTiles";
 import MotInputForm from "./MotInputForm";
@@ -6,8 +6,6 @@ import ProgressBar from "./ProgressBar";
 import MotsTrouvesList from "./MotsTrouvesList";
 import FinDuJeu from "./FinDuJeu";
 import MotivationMessage from "./MotivationMessage";
-import AudioToggleButton from "./AudioToggleButton";
-import ConfettiWrapper from "./ConfettiWrapper";
 import { toutesLesReponsesSontBonnes } from "./utils";
 import Navbar from "../Navbar";
 import "./anagrammesJeu.css";
@@ -20,10 +18,7 @@ export default function AnagrammesJeu() {
   const [solutionsPossibles, setSolutionsPossibles] = useState([]);
   const [jeuTermine, setJeuTermine] = useState(false);
   const [messageErreur, setMessageErreur] = useState("");
-  const [tempsRestant, setTempsRestant] = useState(32);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [audioAlerte, setAudioAlerte] = useState(null);
-  const [afficherConfetti, setAfficherConfetti] = useState(false);
+  const [tempsRestant, setTempsRestant] = useState(120);
 
   const fetchJSON = async (url) => {
     try {
@@ -48,7 +43,7 @@ export default function AnagrammesJeu() {
     setSolutionsTrouvees([]);
     setJeuTermine(false);
     setMessageErreur("");
-    setTempsRestant(32);
+    setTempsRestant(120);
   }, []);
 
   useEffect(() => {
@@ -69,57 +64,6 @@ export default function AnagrammesJeu() {
     }, 1000);
     return () => clearInterval(timer);
   }, [jeuTermine]);
-  useEffect(() => {
-    if (
-      jeuTermine &&
-      toutesLesReponsesSontBonnes(solutionsTrouvees, solutionsPossibles)
-    ) {
-      setAfficherConfetti(true);
-      console.log("Confetti lancé !");
-
-      const timer = setTimeout(() => {
-        console.log("Arrêt du confetti après 3 secondes");
-        setAfficherConfetti(false);
-      }, 3000);
-
-      return () => clearTimeout(timer); // Nettoyage si le composant se démonte
-    }
-  }, [jeuTermine, solutionsTrouvees, solutionsPossibles]);
-
-  useEffect(() => {
-    if (tempsRestant === 10) {
-      const audio = new Audio("/alerte.mp3");
-      audio.play();
-    }
-  }, [tempsRestant]);
-
-  useEffect(() => {
-    if (tempsRestant === 0 && audioEnabled && audioAlerte) {
-      audioAlerte.play().catch((err) => {
-        console.warn("Lecture audio bloquée :", err);
-      });
-    }
-  }, [tempsRestant, audioEnabled, audioAlerte]);
-
-  useEffect(() => {
-    const audio = new Audio("/alerte.mp3");
-    setAudioAlerte(audio);
-  }, []);
-
-  const handleEnableAudio = () => {
-    if (audioAlerte) {
-      audioAlerte
-        .play()
-        .then(() => {
-          audioAlerte.pause();
-          audioAlerte.currentTime = 0;
-          setAudioEnabled(true);
-        })
-        .catch((err) => {
-          console.warn("Audio bloqué :", err);
-        });
-    }
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -189,9 +133,7 @@ export default function AnagrammesJeu() {
   return (
     <div className="container text-center">
       <Navbar />
-      {!audioEnabled && !jeuTermine && (
-        <AudioToggleButton onClick={handleEnableAudio} />
-      )}
+
       <TimerDisplay tempsRestant={tempsRestant} jeuTermine={jeuTermine} />
       <div className="conteneur-principal mt-3 mb-3 text-secondary text-center">
         <ScrabbleTiles lettres={tirage} label="Tirage" />
@@ -250,10 +192,6 @@ export default function AnagrammesJeu() {
           />
         </>
       )}
-
-      {jeuTermine &&
-        toutesLesReponsesSontBonnes(solutionsTrouvees, solutionsPossibles) &&
-        afficherConfetti && <ConfettiWrapper run={afficherConfetti} />}
     </div>
   );
 }
