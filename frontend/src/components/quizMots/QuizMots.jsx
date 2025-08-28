@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import "./QuizMots.css";
 
 export default function QuizMots({ mots, show, onClose }) {
-  console.log("QuizMots rendered with mots:", mots.length);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);

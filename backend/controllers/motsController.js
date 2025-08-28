@@ -1,4 +1,5 @@
 const Mot = require("../models/Mot");
+const Definition = require("../models/Definitions_2_8");
 // Controller pour gérer les mots
 // Utilitaire pour échapper les caractères spéciaux dans une regex
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -120,6 +121,26 @@ exports.getMot = async (req, res) => {
     const mot = await Mot.findOne({ mot: req.params.mot.toUpperCase() });
     if (!mot) return res.status(404).json({ message: "Mot non trouvé" });
     res.json(mot);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Rechercher un mot précis
+// Rechercher un mot précis
+exports.getDefinition = async (req, res) => {
+  console.log(`Recherche de la définition du mot: ${req.params.mot}`);
+  try {
+    const result = await Definition.findOne({
+      mot: req.params.mot,
+    });
+
+    if (!result) {
+      return res.status(404).json({ message: "Mot non trouvé" });
+    }
+
+    console.log(result.definition);
+    res.json({ definition: result.definition });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

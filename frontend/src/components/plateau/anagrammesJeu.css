@@ -132,3 +132,103 @@ fin-animation {
   color: rgb(54, 119, 81);
   font-weight: bold;
 }
+
+.mot { 
+  cursor: pointer;
+}
+.definition-box {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1rem;
+}
+.custom-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+.modal.d-block {
+  z-index: 1050;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+  background: rgb(161, 140, 140);
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 500px;
+  text-align: center;
+  animation: slideUp 0.4s ease-out;
+}
+
+.mot-image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.wiktionary-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #1a0dab;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.wiktionary-link:hover {
+  text-decoration: underline;
+}
+@keyframes zoomIn {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes zoomIn {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal.fade .modal-dialog {
+  transition: none;
+  animation: zoomIn 0.3s ease-out;
+}
