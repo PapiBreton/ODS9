@@ -132,11 +132,10 @@ export default function AnagrammesJeu() {
   return (
     <div className="container text-center">
       <Navbar />
-
       <TimerDisplay tempsRestant={tempsRestant} jeuTermine={jeuTermine} />
       <div className="conteneur-principal mt-3 mb-3 text-secondary text-center">
-        <ScrabbleTiles lettres={tirage} label="Tirage" />
         <ScrabbleTiles lettres={lettresPlateau} label="Lettres disponibles" />
+        <ScrabbleTiles lettres={tirage} label="Tirage" />
       </div>
 
       {!jeuTermine ? (

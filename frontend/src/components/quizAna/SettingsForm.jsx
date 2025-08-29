@@ -2,6 +2,16 @@ import { useState } from "react";
 
 const API = "/api/quizAna";
 
+const labels = {
+  required: "Lettres obligatoires",
+  forbidden: "Lettres interdites",
+  length: "Longueur",
+  submit: "Lancer QuizMots",
+  loading: "Tirage...",
+  errorOverlap:
+    "Une lettre ne peut pas être à la fois obligatoire et interdite.",
+};
+
 export default function SettingsForm({ onStart }) {
   const [required, setRequired] = useState("");
   const [forbidden, setForbidden] = useState("");
@@ -13,14 +23,22 @@ export default function SettingsForm({ onStart }) {
     e.preventDefault();
     setErr("");
     setLoading(true);
+
     try {
+      // Validation : lettres communes
+      if ([...required].some((char) => forbidden.includes(char))) {
+        throw new Error(labels.errorOverlap);
+      }
+
       const res = await fetch(`${API}/draw`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ required, forbidden, length: Number(length) }),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur tirage");
+
       onStart({ normalized: data.normalized, total: data.total });
     } catch (e) {
       setErr(e.message);
@@ -34,19 +52,24 @@ export default function SettingsForm({ onStart }) {
       <h5 className="mb-3">Paramètres</h5>
       <div className="row g-3">
         <InputField
-          label="Lettres obligatoires"
+          label={labels.required}
+          id="quiz-obligatoires"
           value={required}
-          onChange={(v) => setRequired(v)}
+          onChange={setRequired}
         />
         <InputField
-          label="Lettres interdites"
+          label={labels.forbidden}
+          id="quiz-interdites"
           value={forbidden}
-          onChange={(v) => setForbidden(v)}
+          onChange={setForbidden}
         />
         <div className="col-sm-4">
-          <label className="form-label">Longueur</label>
+          <label htmlFor="quiz-longueur" className="form-label">
+            {labels.length}
+          </label>
           <input
             type="number"
+            id="quiz-longueur"
             className="form-control"
             value={length}
             min={2}
@@ -55,19 +78,25 @@ export default function SettingsForm({ onStart }) {
           />
         </div>
       </div>
+
       {err && <div className="alert alert-danger mt-3">{err}</div>}
+
       <button className="btn btn-primary mt-3" disabled={loading}>
-        {loading ? "Tirage..." : "Lancer QuizMots"}
+        {loading && <span className="spinner-border spinner-border-sm me-2" />}
+        {loading ? labels.loading : labels.submit}
       </button>
     </form>
   );
 }
 
-function InputField({ label, value, onChange }) {
+function InputField({ label, id, value, onChange }) {
   return (
     <div className="col-sm-4">
-      <label className="form-label">{label}</label>
+      <label htmlFor={id} className="form-label">
+        {label}
+      </label>
       <input
+        id={id}
         className="form-control text-uppercase"
         value={value}
         onChange={(e) =>

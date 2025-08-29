@@ -65,7 +65,8 @@ export default function GamePanel({ game, onQuit }) {
       <form className="input-group mt-3" onSubmit={handleGuess}>
         <input
           className="form-control form-control-lg text-uppercase"
-          placeholder="Tapez un anagramme"
+          id="input-response-anagramme"
+          placeholder="Tapez une anagramme"
           value={guess}
           onChange={(e) =>
             setGuess(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))

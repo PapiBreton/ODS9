@@ -67,6 +67,7 @@ export default function QuizMots({ mots, show, onClose }) {
           <form onSubmit={handleSubmit} className="quiz-form">
             <input
               type="text"
+              id="input-reponse"
               value={inputValue}
               disabled={isCorrect}
               onChange={(e) => setInputValue(e.target.value)}
